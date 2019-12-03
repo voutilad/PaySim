@@ -1,11 +1,11 @@
 package org.paysim.paysim.actors;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 import static java.lang.Math.max;
 
 import ec.util.MersenneTwisterFast;
+import org.paysim.paysim.PaySimState;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 import sim.util.distribution.Binomial;
@@ -42,19 +42,19 @@ public class Client extends SuperActor implements Steppable {
         this.bank = bank;
     }
 
-    public Client(PaySim paySim) {
+    public Client(PaySimState paySim) {
         super(CLIENT_IDENTIFIER + paySim.generateId());
         this.bank = paySim.pickRandomBank();
-        this.clientProfile = new ClientProfile(paySim.pickNextClientProfile(), paySim.random);
+        this.clientProfile = new ClientProfile(paySim.pickNextClientProfile(), paySim.getRNG());
         this.clientWeight = ((double) clientProfile.getClientTargetCount()) /  Parameters.stepsProfiles.getTotalTargetCount();
-        this.initialBalance = BalancesClients.pickNextBalance(paySim.random);
+        this.initialBalance = BalancesClients.pickNextBalance(paySim.getRNG());
         this.balance = initialBalance;
-        this.overdraftLimit = pickOverdraftLimit(paySim.random);
+        this.overdraftLimit = pickOverdraftLimit(paySim.getRNG());
     }
 
     @Override
     public void step(SimState state) {
-        PaySim paySim = (PaySim) state;
+        PaySimState paySim = (PaySimState) state;
         int stepTargetCount = paySim.getStepTargetCount();
         if (stepTargetCount > 0) {
             MersenneTwisterFast random = paySim.random;
@@ -68,7 +68,8 @@ public class Client extends SuperActor implements Steppable {
                 StepActionProfile stepAmountProfile = paySim.getStepAction(action);
                 double amount = pickAmount(random, action, stepAmountProfile);
 
-                makeTransaction(paySim, step, action, amount);
+                List<Transaction> transactions = makeTransaction(paySim, step, action, amount);
+                paySim.onTransactions(transactions);
             }
         }
     }
@@ -176,19 +177,21 @@ public class Client extends SuperActor implements Steppable {
         return amount;
     }
 
-    private void makeTransaction(PaySim state, int step, String action, double amount) {
+    private List<Transaction> makeTransaction(PaySimState state, int step, String action, double amount) {
+        ArrayList<Transaction> transactions = new ArrayList<>();
+
         switch (action) {
             case CASH_IN:
-                handleCashIn(state, step, amount);
+                transactions.add(handleCashIn(state, step, amount));
                 break;
             case CASH_OUT:
-                handleCashOut(state, step, amount);
+                transactions.add( handleCashOut(state, step, amount));
                 break;
             case DEBIT:
-                handleDebit(state, step, amount);
+                transactions.add(handleDebit(state, step, amount));
                 break;
             case PAYMENT:
-                handlePayment(state, step, amount);
+                transactions.add(handlePayment(state, step, amount));
                 break;
             // For transfer transaction there is a limit so we have to split big transactions in smaller chunks
             case TRANSFER:
@@ -196,23 +199,27 @@ public class Client extends SuperActor implements Steppable {
                 double reducedAmount = amount;
                 boolean lastTransferFailed = false;
                 while (reducedAmount > Parameters.transferLimit && !lastTransferFailed) {
-                    lastTransferFailed = !handleTransfer(state, step, Parameters.transferLimit, clientTo);
+                    Transaction t = handleTransfer(state, step, Parameters.transferLimit, clientTo);
+                    transactions.add(t);
+                    lastTransferFailed = !t.isSuccessful();
                     reducedAmount -= Parameters.transferLimit;
                 }
                 if (reducedAmount > 0 && !lastTransferFailed) {
-                    handleTransfer(state, step, reducedAmount, clientTo);
+                    transactions.add(handleTransfer(state, step, reducedAmount, clientTo));
                 }
                 break;
             case DEPOSIT:
-                handleDeposit(state, step, amount);
+                transactions.add(handleDeposit(state, step, amount));
                 break;
             default:
                 throw new UnsupportedOperationException("Action not implemented in Client");
         }
+
+        return transactions;
     }
 
-    protected void handleCashIn(PaySim paysim, int step, double amount) {
-        Merchant merchantTo = paysim.pickRandomMerchant();
+    protected Transaction handleCashIn(PaySimState state, int step, double amount) {
+        Merchant merchantTo = state.pickRandomMerchant();
         String nameOrig = this.getName();
         String nameDest = merchantTo.getName();
         double oldBalanceOrig = this.getBalance();
@@ -223,13 +230,12 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
-        Transaction t = new Transaction(step, CASH_IN, amount, nameOrig, oldBalanceOrig,
+        return new Transaction(step, CASH_IN, amount, nameOrig, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
-        paysim.getTransactions().add(t);
     }
 
-    protected void handleCashOut(PaySim paysim, int step, double amount) {
-        Merchant merchantTo = paysim.pickRandomMerchant();
+    protected Transaction handleCashOut(PaySimState state, int step, double amount) {
+        Merchant merchantTo = state.pickRandomMerchant();
         String nameOrig = this.getName();
         String nameDest = merchantTo.getName();
         double oldBalanceOrig = this.getBalance();
@@ -245,10 +251,10 @@ public class Client extends SuperActor implements Steppable {
 
         t.setUnauthorizedOverdraft(isUnauthorizedOverdraft);
         t.setFraud(this.isFraud());
-        paysim.getTransactions().add(t);
+        return t;
     }
 
-    protected void handleDebit(PaySim paysim, int step, double amount) {
+    protected Transaction handleDebit(PaySimState state, int step, double amount) {
         String nameOrig = this.getName();
         String nameDest = this.bank.getName();
         double oldBalanceOrig = this.getBalance();
@@ -263,11 +269,11 @@ public class Client extends SuperActor implements Steppable {
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
 
         t.setUnauthorizedOverdraft(isUnauthorizedOverdraft);
-        paysim.getTransactions().add(t);
+        return t;
     }
 
-    protected void handlePayment(PaySim paysim, int step, double amount) {
-        Merchant merchantTo = paysim.pickRandomMerchant();
+    protected Transaction handlePayment(PaySimState state, int step, double amount) {
+        Merchant merchantTo = state.pickRandomMerchant();
 
         String nameOrig = this.getName();
         String nameDest = merchantTo.getName();
@@ -286,19 +292,18 @@ public class Client extends SuperActor implements Steppable {
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
 
         t.setUnauthorizedOverdraft(isUnauthorizedOverdraft);
-        paysim.getTransactions().add(t);
+        return t;
     }
 
-    protected boolean handleTransfer(PaySim paysim, int step, double amount, Client clientTo) {
+    protected Transaction handleTransfer(PaySimState state, int step, double amount, Client clientTo) {
         String nameOrig = this.getName();
         String nameDest = clientTo.getName();
         double oldBalanceOrig = this.getBalance();
         double oldBalanceDest = clientTo.getBalance();
 
-        boolean transferSuccessful;
         if (!isDetectedAsFraud(amount)) {
             boolean isUnauthorizedOverdraft = this.withdraw(amount);
-            transferSuccessful = !isUnauthorizedOverdraft;
+            boolean transferSuccessful = !isUnauthorizedOverdraft;
             if (transferSuccessful) {
                 clientTo.deposit(amount);
             }
@@ -311,9 +316,10 @@ public class Client extends SuperActor implements Steppable {
 
             t.setUnauthorizedOverdraft(isUnauthorizedOverdraft);
             t.setFraud(this.isFraud());
-            paysim.getTransactions().add(t);
+            t.setSuccessful(transferSuccessful);
+            return t;
+
         } else { // create the transaction but don't move any money as the transaction was detected as fraudulent
-            transferSuccessful = false;
             double newBalanceOrig = this.getBalance();
             double newBalanceDest = clientTo.getBalance();
 
@@ -322,12 +328,12 @@ public class Client extends SuperActor implements Steppable {
 
             t.setFlaggedFraud(true);
             t.setFraud(this.isFraud());
-            paysim.getTransactions().add(t);
+            t.setSuccessful(false);
+            return t;
         }
-        return transferSuccessful;
     }
 
-    protected void handleDeposit(PaySim paysim, int step, double amount) {
+    protected Transaction handleDeposit(PaySimState state, int step, double amount) {
         String nameOrig = this.getName();
         String nameDest = this.bank.getName();
         double oldBalanceOrig = this.getBalance();
@@ -338,10 +344,8 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = this.bank.getBalance();
 
-        Transaction t = new Transaction(step, DEPOSIT, amount, nameOrig, oldBalanceOrig,
+        return new Transaction(step, DEPOSIT, amount, nameOrig, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
-
-        paysim.getTransactions().add(t);
     }
 
     private boolean isDetectedAsFraud(double amount) {

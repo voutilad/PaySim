@@ -15,7 +15,7 @@ class Aggregator {
     private static final int DOUBLE_PRECISION = 2;
     private static final int HOURS_IN_DAY = 24, DAYS_IN_MONTH = 30;
 
-    public static Map<String, StepActionProfile> generateStepAggregate(int step, ArrayList<Transaction> transactionList) {
+    public static Map<String, StepActionProfile> generateStepAggregate(long step, ArrayList<Transaction> transactionList) {
         Map<String, StepActionProfile> stepRecord = new HashMap<>();
         for (String action : ActionTypes.getActions()) {
             StepActionProfile actionRecord = getAggregatedRecord(action, step, transactionList);
@@ -26,7 +26,7 @@ class Aggregator {
         return stepRecord;
     }
 
-    private static StepActionProfile getAggregatedRecord(String action, int step, ArrayList<Transaction> transactionsList) {
+    private static StepActionProfile getAggregatedRecord(String action, long step, ArrayList<Transaction> transactionsList) {
         ArrayList<Transaction> actionTransactionsList = transactionsList.stream()
                 .filter(t -> t.getAction().equals(action))
                 .filter(t -> !t.isFailedTransaction())
@@ -38,9 +38,9 @@ class Aggregator {
             double average = getTruncatedDouble(sum / (double) count);
             double std = getTruncatedDouble(computeStd(actionTransactionsList, average));
 
-            int month = step / (DAYS_IN_MONTH * HOURS_IN_DAY);
-            int day = (step % (DAYS_IN_MONTH * HOURS_IN_DAY)) / HOURS_IN_DAY;
-            int hour = step % HOURS_IN_DAY;
+            long month = step / (DAYS_IN_MONTH * HOURS_IN_DAY);
+            long day = (step % (DAYS_IN_MONTH * HOURS_IN_DAY)) / HOURS_IN_DAY;
+            long hour = step % HOURS_IN_DAY;
 
             return new StepActionProfile(step,
                     action,

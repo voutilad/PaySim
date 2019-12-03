@@ -20,6 +20,7 @@ public class Transaction implements Serializable {
     private boolean isFraud = false;
     private boolean isFlaggedFraud = false;
     private boolean isUnauthorizedOverdraft = false;
+    private boolean isSuccessful = false;
 
     public Transaction(int step, String action, double amount, String nameOrig, double oldBalanceOrig,
                        double newBalanceOrig, String nameDest, double oldBalanceDest, double newBalanceDest) {
@@ -94,6 +95,14 @@ public class Transaction implements Serializable {
         return newBalanceDest;
     }
 
+    public boolean isSuccessful() {
+        return isSuccessful;
+    }
+
+    public void setSuccessful(boolean successful) {
+        isSuccessful = successful;
+    }
+
     @Override
     public String toString(){
         ArrayList<String> properties = new ArrayList<>();
@@ -110,6 +119,7 @@ public class Transaction implements Serializable {
         properties.add(Output.formatBoolean(isFraud));
         properties.add(Output.formatBoolean(isFlaggedFraud));
         properties.add(Output.formatBoolean(isUnauthorizedOverdraft));
+        properties.add(Output.formatBoolean(isSuccessful));
 
         return String.join(Output.OUTPUT_SEPARATOR, properties);
     }

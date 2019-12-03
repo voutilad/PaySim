@@ -3,14 +3,14 @@ package org.paysim.paysim.actors.networkdrugs;
 import ec.util.MersenneTwisterFast;
 import org.apache.tinkerpop.gremlin.structure.*;
 
-import org.paysim.paysim.PaySim;
+import org.paysim.paysim.PaySimState;
 import org.paysim.paysim.utils.GraphUtils;
 import org.paysim.paysim.utils.RandomCollection;
 
 import java.util.Map;
 
 public class NetworkDrug {
-    public static void createNetwork(PaySim paySim, String drugNetworkFile) {
+    public static void createNetwork(PaySimState paySim, String drugNetworkFile) {
         // Load graph file
         Graph graph = GraphUtils.loadFromFile(drugNetworkFile);
 

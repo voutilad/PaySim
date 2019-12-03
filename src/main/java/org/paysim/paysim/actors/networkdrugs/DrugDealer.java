@@ -1,15 +1,15 @@
 package org.paysim.paysim.actors.networkdrugs;
 
+import org.paysim.paysim.PaySimState;
 import sim.engine.SimState;
 
-import org.paysim.paysim.PaySim;
 import org.paysim.paysim.actors.Client;
 
 public class DrugDealer extends Client {
     private double thresholdForCashOut;
     private double drugMoneyInAccount;
 
-    public DrugDealer(PaySim paySim, double thresholdForCashOut) {
+    public DrugDealer(PaySimState paySim, double thresholdForCashOut) {
         super(paySim);
         this.thresholdForCashOut = thresholdForCashOut;
         this.drugMoneyInAccount = 0;
@@ -17,7 +17,7 @@ public class DrugDealer extends Client {
 
     @Override
     public void step(SimState state) {
-        PaySim paySim = (PaySim) state;
+        PaySimState paySim = (PaySimState) state;
         int step = (int) paySim.schedule.getSteps();
 
         super.step(state);

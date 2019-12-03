@@ -1,19 +1,20 @@
 package org.paysim.paysim.actors.networkdrugs;
 
 import ec.util.MersenneTwisterFast;
+import org.paysim.paysim.PaySimState;
+import org.paysim.paysim.base.Transaction;
 import org.paysim.paysim.parameters.Parameters;
-import sim.engine.SimState;
 
-import org.paysim.paysim.PaySim;
 import org.paysim.paysim.actors.Client;
 import org.paysim.paysim.utils.RandomCollection;
+import sim.engine.SimState;
 
 public class DrugConsumer extends Client {
     private DrugDealer dealer;
     private RandomCollection<Double> probAmountProfile;
     private double probabilityBuy;
 
-    public DrugConsumer(PaySim paySim, DrugDealer dealer, double monthlySpending, RandomCollection<Double> probAmountProfile, double meanTr) {
+    public DrugConsumer(PaySimState paySim, DrugDealer dealer, double monthlySpending, RandomCollection<Double> probAmountProfile, double meanTr) {
         super(paySim);
         this.dealer = dealer;
         this.probAmountProfile = probAmountProfile;
@@ -22,7 +23,7 @@ public class DrugConsumer extends Client {
 
     @Override
     public void step(SimState state) {
-        PaySim paySim = (PaySim) state;
+        PaySimState paySim = (PaySimState) state;
         int step = (int) paySim.schedule.getSteps();
 
         super.step(state);
@@ -34,12 +35,14 @@ public class DrugConsumer extends Client {
         }
     }
 
-    private void handleTransferDealer(PaySim paySim, int step, double amount) {
-        boolean success = handleTransfer(paySim, step, amount, dealer);
+    private Transaction handleTransferDealer(PaySimState paySim, int step, double amount) {
+        Transaction t = handleTransfer(paySim, step, amount, dealer);
 
-        if (success) {
+        if (t.isSuccessful()) {
             dealer.addMoneyFromDrug(amount);
         }
+
+        return t;
     }
 
     private boolean wantsToBuyDrugs(MersenneTwisterFast random) {

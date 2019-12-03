@@ -22,7 +22,7 @@ public class Output {
     private static String filenameGlobalSummary, filenameParameters, filenameSummary, filenameRawLog,
             filenameStepAggregate, filenameClientProfiles, filenameFraudsters;
 
-    public static void incrementalWriteRawLog(int step, ArrayList<Transaction> transactions) {
+    public static void incrementalWriteRawLog(long step, ArrayList<Transaction> transactions) {
         String rawLogHeader = "step,action,amount,nameOrig,oldBalanceOrig,newBalanceOrig,nameDest,oldBalanceDest,newBalanceDest,isFraud,isFlaggedFraud,isUnauthorizedOverdraft";
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filenameRawLog, true));
@@ -40,7 +40,7 @@ public class Output {
         }
     }
 
-    public static void incrementalWriteStepAggregate(int step, ArrayList<Transaction> transactions) {
+    public static void incrementalWriteStepAggregate(long step, ArrayList<Transaction> transactions) {
         String stepAggregateHeader = "action,month,day,hour,count,sum,avg,std,step";
         Map<String, StepActionProfile> stepRecord = Aggregator.generateStepAggregate(step, transactions);
         try {

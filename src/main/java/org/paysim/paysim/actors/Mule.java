@@ -1,6 +1,7 @@
 package org.paysim.paysim.actors;
 
 import org.paysim.paysim.PaySim;
+import org.paysim.paysim.PaySimState;
 import org.paysim.paysim.base.Transaction;
 
 public class Mule extends Client {
@@ -11,10 +12,10 @@ public class Mule extends Client {
         this.overdraftLimit = 0;
     }
 
-    void fraudulentCashOut(PaySim paysim, int step, double amount) {
+    Transaction fraudulentCashOut(PaySimState state, int step, double amount) {
         String action = "CASH_OUT";
 
-        Merchant merchantTo = paysim.pickRandomMerchant();
+        Merchant merchantTo = state.pickRandomMerchant();
         String nameOrig = this.getName();
         String nameDest = merchantTo.getName();
         double oldBalanceOrig = this.getBalance();
@@ -28,6 +29,6 @@ public class Mule extends Client {
         Transaction t = new Transaction(step, action, amount, nameOrig, oldBalanceOrig,
                 newBalanceOrig, nameDest, oldBalanceDest, newBalanceDest);
         t.setFraud(this.isFraud());
-        paysim.getTransactions().add(t);
+        return t;
     }
 }

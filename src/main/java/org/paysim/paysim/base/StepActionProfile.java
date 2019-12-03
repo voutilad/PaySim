@@ -6,10 +6,10 @@ import org.paysim.paysim.output.Output;
 
 public class StepActionProfile {
     private final String action;
-    private final int step, month, day, hour, count;
+    private final long step, month, day, hour, count;
     private final double totalSum, avgAmount, stdAmount;
 
-    public StepActionProfile(int step, String action, int month, int day, int hour, int count, double totalSum, double avgAmount, double stdAmount) {
+    public StepActionProfile(long step, String action, long month, long day, long hour, long count, double totalSum, double avgAmount, double stdAmount) {
         this.step = step;
         this.action = action;
         this.month = month;
@@ -21,7 +21,7 @@ public class StepActionProfile {
         this.stdAmount = stdAmount;
     }
 
-    public int getCount() {
+    public long getCount() {
         return count;
     }
 

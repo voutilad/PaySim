@@ -57,8 +57,8 @@ class SummaryBuilder {
 
     private static double objectiveFunctionSteps(StepsProfiles targetStepsProfiles, StepsProfiles simulationStepsProfiles, StringBuilder summaryBuilder) {
         Map<String, Function<StepActionProfile, Double>> statExtractor = new HashMap<>();
-        Function<StepActionProfile, Integer>  getCount = StepActionProfile::getCount;
-        Function<StepActionProfile, Double> getCountDouble = getCount.andThen(Integer::doubleValue);
+        Function<StepActionProfile, Long>  getCount = StepActionProfile::getCount;
+        Function<StepActionProfile, Double> getCountDouble = getCount.andThen(Long::doubleValue);
 
         statExtractor.put("Average amount", StepActionProfile::getAvgAmount);
         statExtractor.put("Std amount", StepActionProfile::getStdAmount);
