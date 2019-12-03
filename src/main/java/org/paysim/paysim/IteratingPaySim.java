@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 public class IteratingPaySim extends PaySimState implements Iterator<Transaction> {
 
     public IteratingPaySim() {
-        super((int) (System.currentTimeMillis() % Integer.MAX_VALUE));
+        super(Parameters.getSeed());
 
         // XXX: for now, force it to only do 4 while I work this out.
         Parameters.nbSteps = 4;

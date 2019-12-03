@@ -185,7 +185,7 @@ public class Client extends SuperActor implements Steppable {
                 transactions.add(handleCashIn(state, step, amount));
                 break;
             case CASH_OUT:
-                transactions.add( handleCashOut(state, step, amount));
+                transactions.add(handleCashOut(state, step, amount));
                 break;
             case DEBIT:
                 transactions.add(handleDebit(state, step, amount));
