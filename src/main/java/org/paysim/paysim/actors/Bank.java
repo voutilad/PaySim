@@ -6,4 +6,9 @@ public class Bank extends SuperActor {
     public Bank(String name) {
         super(BANK_IDENTIFIER + name);
     }
+
+    @Override
+    public Type getType() {
+        return Type.BANK;
+    }
 }

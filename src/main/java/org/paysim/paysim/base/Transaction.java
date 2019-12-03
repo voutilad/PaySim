@@ -3,6 +3,7 @@ package org.paysim.paysim.base;
 import java.io.Serializable;
 import java.util.ArrayList;
 
+import org.paysim.paysim.actors.SuperActor;
 import org.paysim.paysim.output.Output;
 
 public class Transaction implements Serializable {
@@ -12,9 +13,11 @@ public class Transaction implements Serializable {
     private final double amount;
 
     private final String nameOrig;
+    private final SuperActor.Type typeOrig;
     private final double oldBalanceOrig, newBalanceOrig;
 
     private final String nameDest;
+    private final SuperActor.Type typeDest;
     private final double oldBalanceDest, newBalanceDest;
 
     private boolean isFraud = false;
@@ -22,15 +25,33 @@ public class Transaction implements Serializable {
     private boolean isUnauthorizedOverdraft = false;
     private boolean isSuccessful = false;
 
-    public Transaction(int step, String action, double amount, String nameOrig, double oldBalanceOrig,
-                       double newBalanceOrig, String nameDest, double oldBalanceDest, double newBalanceDest) {
+    /**
+     * Record pertinent details of a financial transaction, getting values from an originator and a destination.
+     *
+     * Implemented in such a way as to not purposely keep references to {SuperActor} instances since it's possible
+     * a large quantity of Transactions may be kept in memory/on-heap at a time.
+     *
+     * @param step
+     * @param action
+     * @param amount
+     * @param originator
+     * @param oldBalanceOrig
+     * @param newBalanceOrig
+     * @param destination
+     * @param oldBalanceDest
+     * @param newBalanceDest
+     */
+    public Transaction(int step, String action, double amount, SuperActor originator, double oldBalanceOrig,
+                       double newBalanceOrig, SuperActor destination, double oldBalanceDest, double newBalanceDest) {
         this.step = step;
         this.action = action;
         this.amount = amount;
-        this.nameOrig = nameOrig;
+        this.nameOrig = originator.getName();
+        this.typeOrig = originator.getType();
         this.oldBalanceOrig = oldBalanceOrig;
         this.newBalanceOrig = newBalanceOrig;
-        this.nameDest = nameDest;
+        this.nameDest = destination.getName();
+        this.typeDest = destination.getType();
         this.oldBalanceDest = oldBalanceDest;
         this.newBalanceDest = newBalanceDest;
     }

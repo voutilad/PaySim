@@ -21,6 +21,11 @@ public class Fraudster extends SuperActor implements Steppable {
     }
 
     @Override
+    public Type getType() {
+        return Type.FRAUDSTER;
+    }
+
+    @Override
     public void step(SimState state) {
         ArrayList<Transaction> transactions = new ArrayList<>();
         PaySimState paysim = (PaySimState) state;

@@ -6,4 +6,9 @@ public class Merchant extends SuperActor {
     public Merchant(String name) {
         super(MERCHANT_IDENTIFIER + name);
     }
+
+    @Override
+    public Type getType() {
+        return Type.MERCHANT;
+    }
 }

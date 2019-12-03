@@ -1,10 +1,18 @@
 package org.paysim.paysim.actors;
 
-class SuperActor {
+public abstract class SuperActor {
     private final String name;
     private boolean isFraud = false;
     double balance = 0;
     double overdraftLimit;
+
+    public enum Type {
+        BANK,
+        CLIENT,
+        FRAUDSTER,
+        MERCHANT,
+        MULE
+    }
 
     SuperActor(String name) {
         this.name = name;
@@ -42,8 +50,10 @@ class SuperActor {
         return name;
     }
 
+    public abstract Type getType();
+
     @Override
     public String toString() {
-        return name;
+        return String.format("%s [%s]", name, getType());
     }
 }
