@@ -11,7 +11,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-
+/**
+ * This is the original PaySim class from the parent project.
+ *
+ * In general, it's logic is retained unchanged.
+ */
 public class PaySim extends PaySimState {
 
     private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "5"};
@@ -78,6 +82,7 @@ public class PaySim extends PaySimState {
         return true;
     }
 
+    @Override
     public void run() {
         System.out.println("\nStarting PaySim Running for " + Parameters.nbSteps + " steps.");
         long startTime = System.currentTimeMillis();

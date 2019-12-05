@@ -4,12 +4,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class CSVReader {
     private static final String CSV_SEPARATOR = ",";
 
-    public static ArrayList<String[]> read(String csvFile) {
-        ArrayList<String[]> csvContent = new ArrayList<>();
+    public static List<String[]> read(String csvFile) {
+        List<String[]> csvContent = new ArrayList<>();
         try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
             // Skip header
             br.readLine();

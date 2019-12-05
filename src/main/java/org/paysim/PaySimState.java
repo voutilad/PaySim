@@ -23,10 +23,10 @@ import java.util.Map;
 public abstract class PaySimState extends SimState {
     public static final double PAYSIM_VERSION = 2.0;
 
-    protected ArrayList<Client> clients = new ArrayList<>();
-    protected ArrayList<Merchant> merchants = new ArrayList<>();
-    protected ArrayList<Fraudster> fraudsters = new ArrayList<>();
-    protected ArrayList<Bank> banks = new ArrayList<>();
+    protected List<Client> clients = new ArrayList<>();
+    protected List<Merchant> merchants = new ArrayList<>();
+    protected List<Fraudster> fraudsters = new ArrayList<>();
+    protected List<Bank> banks = new ArrayList<>();
 
     protected Map<ClientActionProfile, Integer> countProfileAssignment = new HashMap<>();
 
@@ -42,6 +42,8 @@ public abstract class PaySimState extends SimState {
 
     protected abstract boolean onStep(long stepNum);
 
+    public abstract void run();
+
     protected void runSimulation() {
         currentStep = 0;
         super.start();
@@ -56,6 +58,7 @@ public abstract class PaySimState extends SimState {
             if (currentStep > Integer.MAX_VALUE) // not supported yet
                 break;
         }
+        super.finish();
     }
 
     private void initCounters() {
@@ -167,7 +170,7 @@ public abstract class PaySimState extends SimState {
         return Parameters.stepsProfiles.getActionForStep((int) currentStep, action);
     }
 
-    public ArrayList<Client> getClients() {
+    public List<Client> getClients() {
         return clients;
     }
 

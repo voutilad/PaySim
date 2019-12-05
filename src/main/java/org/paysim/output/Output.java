@@ -4,7 +4,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.paysim.base.ClientActionProfile;
@@ -22,7 +22,7 @@ public class Output {
     private static String filenameGlobalSummary, filenameParameters, filenameSummary, filenameRawLog,
             filenameStepAggregate, filenameClientProfiles, filenameFraudsters;
 
-    public static void incrementalWriteRawLog(long step, ArrayList<Transaction> transactions) {
+    public static void incrementalWriteRawLog(long step, List<Transaction> transactions) {
         String rawLogHeader = "step,action,amount,nameOrig,oldBalanceOrig,newBalanceOrig,nameDest,oldBalanceDest,newBalanceDest,isFraud,isFlaggedFraud,isUnauthorizedOverdraft";
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filenameRawLog, true));
@@ -40,7 +40,7 @@ public class Output {
         }
     }
 
-    public static void incrementalWriteStepAggregate(long step, ArrayList<Transaction> transactions) {
+    public static void incrementalWriteStepAggregate(long step, List<Transaction> transactions) {
         String stepAggregateHeader = "action,month,day,hour,count,sum,avg,std,step";
         Map<String, StepActionProfile> stepRecord = Aggregator.generateStepAggregate(step, transactions);
         try {
@@ -61,7 +61,7 @@ public class Output {
     }
 
 
-    public static void writeFraudsters(ArrayList<Fraudster> fraudsters) {
+    public static void writeFraudsters(List<Fraudster> fraudsters) {
         String fraudsterHeader = "name,nbVictims,profit";
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filenameFraudsters));
@@ -151,7 +151,7 @@ public class Output {
     }
 
     public static void writeDatabaseLog(String dbUrl, String dbUser, String dbPassword,
-                                        ArrayList<Transaction> transactions, String simulatorName) {
+                                        List<Transaction> transactions, String simulatorName) {
         DatabaseHandler handler = new DatabaseHandler(dbUrl, dbUser, dbPassword);
         for (Transaction t : transactions) {
             handler.insert(simulatorName, t);

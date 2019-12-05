@@ -3,6 +3,7 @@ package org.paysim.output;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -14,7 +15,7 @@ class Aggregator {
     private static final int DOUBLE_PRECISION = 2;
     private static final int HOURS_IN_DAY = 24, DAYS_IN_MONTH = 30;
 
-    public static Map<String, StepActionProfile> generateStepAggregate(long step, ArrayList<Transaction> transactionList) {
+    public static Map<String, StepActionProfile> generateStepAggregate(long step, List<Transaction> transactionList) {
         Map<String, StepActionProfile> stepRecord = new HashMap<>();
         for (String action : ActionTypes.getActions()) {
             StepActionProfile actionRecord = getAggregatedRecord(action, step, transactionList);
@@ -25,8 +26,8 @@ class Aggregator {
         return stepRecord;
     }
 
-    private static StepActionProfile getAggregatedRecord(String action, long step, ArrayList<Transaction> transactionsList) {
-        ArrayList<Transaction> actionTransactionsList = transactionsList.stream()
+    private static StepActionProfile getAggregatedRecord(String action, long step, List<Transaction> transactionsList) {
+        List<Transaction> actionTransactionsList = transactionsList.stream()
                 .filter(t -> t.getAction().equals(action))
                 .filter(t -> !t.isFailedTransaction())
                 .collect(Collectors.toCollection(ArrayList::new));
@@ -56,7 +57,7 @@ class Aggregator {
 
     }
 
-    private static double computeStd(ArrayList<Transaction> list, double average) {
+    private static double computeStd(List<Transaction> list, double average) {
         // Bessel corrected deviation https://en.wikipedia.org/wiki/Bessel%27s_correction
         return Math.sqrt(list.stream()
                 .map(Transaction::getAmount)
@@ -66,7 +67,7 @@ class Aggregator {
                 / (list.size() - 1);
     }
 
-    private static double computeTotalAmount(ArrayList<Transaction> transactionList) {
+    private static double computeTotalAmount(List<Transaction> transactionList) {
         return transactionList.stream()
                 .mapToDouble(Transaction::getAmount)
                 .sum();

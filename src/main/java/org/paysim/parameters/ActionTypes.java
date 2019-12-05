@@ -1,12 +1,8 @@
 package org.paysim.parameters;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
-import java.util.ArrayList;
-
 import org.paysim.utils.CSVReader;
+
+import java.util.*;
 
 public class ActionTypes {
     private static final int COLUMN_ACTION = 0, COLUMN_OCCURRENCES = 1;
@@ -14,7 +10,7 @@ public class ActionTypes {
     private static Map<String, Integer> maxOccurrencesPerAction = new HashMap<>();
 
     public static void loadActionTypes(String filename) {
-        ArrayList<String[]> parameters = CSVReader.read(filename);
+        List<String[]> parameters = CSVReader.read(filename);
 
         for (String[] paramLine : parameters) {
             String action = paramLine[COLUMN_ACTION];
@@ -23,7 +19,7 @@ public class ActionTypes {
     }
 
     public static void loadMaxOccurrencesPerClient(String filename) {
-        ArrayList<String[]> parameters = CSVReader.read(filename);
+        List<String[]> parameters = CSVReader.read(filename);
         int loaded = 0;
         for (String[] paramLine : parameters) {
             if (isValidAction(paramLine[COLUMN_ACTION])) {
