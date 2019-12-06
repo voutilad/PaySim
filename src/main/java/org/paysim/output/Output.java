@@ -1,20 +1,20 @@
 package org.paysim.output;
 
+import org.paysim.PaySim;
+import org.paysim.actors.Fraudster;
+import org.paysim.base.ClientActionProfile;
+import org.paysim.base.StepActionProfile;
+import org.paysim.base.Transaction;
+import org.paysim.parameters.Parameters;
+import org.paysim.parameters.StepsProfiles;
+import org.paysim.utils.DatabaseHandler;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
-
-import org.paysim.base.ClientActionProfile;
-import org.paysim.base.StepActionProfile;
-import org.paysim.base.Transaction;
-import org.paysim.parameters.Parameters;
-import org.paysim.parameters.StepsProfiles;
-import org.paysim.PaySim;
-import org.paysim.actors.Fraudster;
-import org.paysim.utils.DatabaseHandler;
 
 public class Output {
     public static final int PRECISION_OUTPUT = 2;
@@ -77,10 +77,10 @@ public class Output {
         }
     }
 
-    public static void writeParameters(long seed) {
+    public static void writeParameters(Parameters parameters) {
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filenameParameters));
-            writer.write(Parameters.toString(seed));
+            writer.write(parameters.toString());
             writer.close();
         } catch (Exception e) {
             e.printStackTrace();
@@ -113,8 +113,9 @@ public class Output {
 
     public static void writeSummarySimulation(PaySim paySim) {
         StringBuilder errorSummary = new StringBuilder();
-        StepsProfiles simulationStepsProfiles = new StepsProfiles(Output.filenameStepAggregate, 1 / Parameters.multiplier, Parameters.nbSteps);
-        double totalErrorRate = SummaryBuilder.buildSummary(Parameters.stepsProfiles, simulationStepsProfiles, errorSummary);
+        Parameters parameters = paySim.getParameters();
+        StepsProfiles simulationStepsProfiles = new StepsProfiles(Output.filenameStepAggregate, 1 / parameters.multiplier, parameters.nbSteps);
+        double totalErrorRate = SummaryBuilder.buildSummary(parameters.stepsProfiles, simulationStepsProfiles, errorSummary);
 
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(Output.filenameSummary));
@@ -124,7 +125,7 @@ public class Output {
             e.printStackTrace();
         }
 
-        String summary = paySim.simulationName + "," + Parameters.nbSteps + "," + paySim.getTotalTransactions() + "," +
+        String summary = paySim.simulationName + "," + parameters.nbSteps + "," + paySim.getTotalTransactions() + "," +
                 paySim.getClients().size() + "," + totalErrorRate;
         writeGlobalSummary(summary);
 
@@ -182,9 +183,9 @@ public class Output {
         return bool ? "1" : "0";
     }
 
-    public static void initOutputFilenames(String simulatorName) {
-        String outputBaseString = Parameters.outputPath + simulatorName + "//" + simulatorName;
-        filenameGlobalSummary = Parameters.outputPath + "summary.csv";
+    public static void initOutputFilenames(String simulatorName, String outputPath) {
+        String outputBaseString = outputPath + simulatorName + "//" + simulatorName;
+        filenameGlobalSummary = outputPath + "summary.csv";
 
         filenameParameters = outputBaseString + "_PaySim.properties";
         filenameSummary = outputBaseString + "_Summary.txt";

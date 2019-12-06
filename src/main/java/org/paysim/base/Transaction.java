@@ -1,10 +1,10 @@
 package org.paysim.base;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-
 import org.paysim.actors.SuperActor;
 import org.paysim.output.Output;
+
+import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Transaction implements Serializable {
     private static final long serialVersionUID = 1L;

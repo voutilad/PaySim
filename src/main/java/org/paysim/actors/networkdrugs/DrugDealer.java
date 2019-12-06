@@ -1,9 +1,8 @@
 package org.paysim.actors.networkdrugs;
 
 import org.paysim.PaySimState;
-import sim.engine.SimState;
-
 import org.paysim.actors.Client;
+import sim.engine.SimState;
 
 public class DrugDealer extends Client {
     private double thresholdForCashOut;

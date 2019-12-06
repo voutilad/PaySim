@@ -1,21 +1,21 @@
 package org.paysim.actors;
 
-import java.util.ArrayList;
-
+import org.paysim.PaySimState;
 import org.paysim.base.Transaction;
 import org.paysim.output.Output;
 import org.paysim.parameters.Parameters;
-import org.paysim.PaySimState;
 import sim.engine.SimState;
 import sim.engine.Steppable;
+
+import java.util.ArrayList;
 
 public class Fraudster extends SuperActor implements Steppable {
     private static final String FRAUDSTER_IDENTIFIER = "C";
     private double profit = 0;
     private int nbVictims = 0;
 
-    public Fraudster(String name) {
-        super(FRAUDSTER_IDENTIFIER + name);
+    public Fraudster(String name, Parameters parameters) {
+        super(FRAUDSTER_IDENTIFIER + name, parameters);
     }
 
     @Override
@@ -29,21 +29,21 @@ public class Fraudster extends SuperActor implements Steppable {
         PaySimState paysim = (PaySimState) state;
         int step = (int) state.schedule.getSteps();
 
-        if (paysim.random.nextDouble() < Parameters.fraudProbability) {
+        if (paysim.random.nextDouble() < parameters.fraudProbability) {
             Client c = paysim.pickRandomClient(getName());
             c.setFraud(true);
             double balance = c.getBalance();
             // create mule client
             if (balance > 0) {
-                int nbTransactions = (int) Math.ceil(balance / Parameters.transferLimit);
+                int nbTransactions = (int) Math.ceil(balance / parameters.transferLimit);
                 for (int i = 0; i < nbTransactions; i++) {
                     boolean transferFailed;
-                    Mule muleClient = new Mule(paysim.generateId(), paysim.pickRandomBank());
+                    Mule muleClient = new Mule(paysim.generateId(), paysim.pickRandomBank(), parameters);
                     muleClient.setFraud(true);
-                    if (balance > Parameters.transferLimit) {
-                        Transaction t = c.handleTransfer(paysim, step, Parameters.transferLimit, muleClient);
+                    if (balance > parameters.transferLimit) {
+                        Transaction t = c.handleTransfer(paysim, step, parameters.transferLimit, muleClient);
                         transferFailed = !t.isSuccessful();
-                        balance -= Parameters.transferLimit;
+                        balance -= parameters.transferLimit;
                         transactions.add(t);
                     } else {
                         Transaction t = c.handleTransfer(paysim, step, balance, muleClient);

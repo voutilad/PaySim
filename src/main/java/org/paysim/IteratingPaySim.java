@@ -3,7 +3,10 @@ package org.paysim;
 import org.paysim.base.Transaction;
 import org.paysim.parameters.Parameters;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
@@ -15,8 +18,8 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     private static int QUEUE_DEPTH = 200_000;
     private SimulationWorker worker;
 
-    public IteratingPaySim() {
-        super(Parameters.getSeed());
+    public IteratingPaySim(Parameters parameters) {
+        super(parameters);
         this.queue = new ArrayBlockingQueue<>(QUEUE_DEPTH);
         this.worker = new SimulationWorker(this);
     }
@@ -53,10 +56,10 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
 
     public static void main(String[] args) {
         System.out.println("Starting an instance of IteratingPaySim...");
-        Parameters.initParameters("PaySim.properties");
+        Parameters parameters = new Parameters("PaySim.properties");
 
         long startTime = System.currentTimeMillis();
-        IteratingPaySim sim = new IteratingPaySim();
+        IteratingPaySim sim = new IteratingPaySim(parameters);
         sim.run();
         //sim.forEachRemaining(tx -> System.out.println(tx.toString()));
         sim.forEachRemaining(tx -> { });

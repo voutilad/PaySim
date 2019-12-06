@@ -1,15 +1,15 @@
 package org.paysim.output;
 
+import org.paysim.base.StepActionProfile;
+import org.paysim.base.Transaction;
+import org.paysim.parameters.ActionTypes;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import org.paysim.base.StepActionProfile;
-import org.paysim.base.Transaction;
-import org.paysim.parameters.ActionTypes;
 
 class Aggregator {
     private static final int DOUBLE_PRECISION = 2;

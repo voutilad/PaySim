@@ -1,12 +1,11 @@
 package org.paysim.base;
 
+import ec.util.MersenneTwisterFast;
+import org.paysim.parameters.ActionTypes;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
-
-import ec.util.MersenneTwisterFast;
-
-import org.paysim.parameters.ActionTypes;
 
 public class ClientProfile {
     private Map<String, ClientActionProfile> profile;

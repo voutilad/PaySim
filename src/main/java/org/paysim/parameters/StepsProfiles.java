@@ -1,11 +1,11 @@
 package org.paysim.parameters;
 
+import org.paysim.base.StepActionProfile;
+import org.paysim.utils.CSVReader;
+
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
-import org.paysim.base.StepActionProfile;
-import org.paysim.utils.CSVReader;
 
 
 public class StepsProfiles {

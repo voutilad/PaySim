@@ -1,11 +1,9 @@
 package org.paysim.actors.networkdrugs;
 
 import ec.util.MersenneTwisterFast;
-import org.paysim.base.Transaction;
-import org.paysim.parameters.Parameters;
 import org.paysim.PaySimState;
-
 import org.paysim.actors.Client;
+import org.paysim.base.Transaction;
 import org.paysim.utils.RandomCollection;
 import sim.engine.SimState;
 
@@ -18,7 +16,7 @@ public class DrugConsumer extends Client {
         super(paySim);
         this.dealer = dealer;
         this.probAmountProfile = probAmountProfile;
-        this.probabilityBuy = monthlySpending / meanTr / Parameters.nbSteps;
+        this.probabilityBuy = monthlySpending / meanTr / paySim.getParameters().nbSteps;
     }
 
     @Override

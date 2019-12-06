@@ -1,12 +1,14 @@
 package org.paysim.parameters;
 
-import java.util.*;
-
 import ec.util.MersenneTwisterFast;
-
 import org.paysim.base.ClientActionProfile;
 import org.paysim.utils.CSVReader;
 import org.paysim.utils.RandomCollection;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ClientsProfiles {
     private static final int COLUMN_ACTION = 0, COLUMN_LOW = 1, COLUMN_HIGH = 2, COLUMN_AVG = 3, COLUMN_STD = 4, COLUMN_FREQ = 5;

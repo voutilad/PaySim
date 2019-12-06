@@ -39,25 +39,25 @@ public class PaySim extends PaySimState {
                 propertiesFile = args[x + 1];
             }
         }
-        Parameters.initParameters(propertiesFile);
+        Parameters parameters = new Parameters(propertiesFile);
         for (int i = 0; i < nbTimesRepeat; i++) {
-            PaySim p = new PaySim();
+            PaySim p = new PaySim(parameters);
             p.run();
         }
     }
 
-    public PaySim() {
-        super(Parameters.getSeed());
+    public PaySim(Parameters parameters) {
+        super(parameters);
 
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
         Date currentTime = new Date();
         simulationName = "PS_" + dateFormat.format(currentTime) + "_" + seed();
 
-        File simulationFolder = new File(Parameters.outputPath + simulationName);
+        File simulationFolder = new File(parameters.outputPath + simulationName);
         simulationFolder.mkdirs();
 
-        Output.initOutputFilenames(simulationName);
-        Output.writeParameters(seed());
+        Output.initOutputFilenames(simulationName, parameters.outputPath);
+        Output.writeParameters(parameters);
     }
 
     @Override
@@ -84,7 +84,7 @@ public class PaySim extends PaySimState {
 
     @Override
     public void run() {
-        System.out.println("\nStarting PaySim Running for " + Parameters.nbSteps + " steps.");
+        System.out.println("\nStarting PaySim Running for " + parameters.nbSteps + " steps.");
         long startTime = System.currentTimeMillis();
 
         runSimulation();
@@ -101,7 +101,7 @@ public class PaySim extends PaySimState {
 
     public void finish() {
         Output.writeFraudsters(fraudsters);
-        Output.writeClientsProfiles(countProfileAssignment, (int) (Parameters.nbClients * Parameters.multiplier));
+        Output.writeClientsProfiles(countProfileAssignment, (int) (parameters.nbClients * parameters.multiplier));
         Output.writeSummarySimulation(this);
     }
 
@@ -118,8 +118,8 @@ public class PaySim extends PaySimState {
         totalTransactionsMade += transactions.size();
 
         Output.incrementalWriteRawLog(currentStep, transactions);
-        if (Parameters.saveToDB) {
-            Output.writeDatabaseLog(Parameters.dbUrl, Parameters.dbUser, Parameters.dbPassword, transactions, simulationName);
+        if (parameters.saveToDB) {
+            Output.writeDatabaseLog(parameters.dbUrl, parameters.dbUser, parameters.dbPassword, transactions, simulationName);
         }
 
         Output.incrementalWriteStepAggregate(currentStep, transactions);

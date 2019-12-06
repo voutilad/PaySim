@@ -1,7 +1,10 @@
 package org.paysim;
 
 import ec.util.MersenneTwisterFast;
+import org.paysim.actors.Bank;
+import org.paysim.actors.Client;
 import org.paysim.actors.Fraudster;
+import org.paysim.actors.Merchant;
 import org.paysim.actors.networkdrugs.NetworkDrug;
 import org.paysim.base.ClientActionProfile;
 import org.paysim.base.StepActionProfile;
@@ -10,9 +13,6 @@ import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.BalancesClients;
 import org.paysim.parameters.Parameters;
 import org.paysim.parameters.TypologiesFiles;
-import org.paysim.actors.Bank;
-import org.paysim.actors.Client;
-import org.paysim.actors.Merchant;
 import sim.engine.SimState;
 
 import java.util.ArrayList;
@@ -23,6 +23,8 @@ import java.util.Map;
 public abstract class PaySimState extends SimState {
     public static final double PAYSIM_VERSION = 2.0;
 
+    protected Parameters parameters;
+
     protected List<Client> clients = new ArrayList<>();
     protected List<Merchant> merchants = new ArrayList<>();
     protected List<Fraudster> fraudsters = new ArrayList<>();
@@ -32,10 +34,11 @@ public abstract class PaySimState extends SimState {
 
     long currentStep = 0;
 
-    public PaySimState(long seed) {
-        super(seed);
+    public PaySimState(Parameters parameters) {
+        super(parameters.seed);
+        this.parameters = parameters;
         BalancesClients.setRandom(super.random);
-        Parameters.clientsProfiles.setRandom(super.random);
+        parameters.clientsProfiles.setRandom(super.random);
     }
 
     public abstract void onTransactions(List<Transaction> transactions);
@@ -50,7 +53,7 @@ public abstract class PaySimState extends SimState {
         initCounters();
         initActors();
 
-        while ((currentStep = schedule.getSteps()) < Parameters.nbSteps) {
+        while ((currentStep = schedule.getSteps()) < parameters.nbSteps) {
             if (!schedule.step(this))
                 break;
             if (!onStep(currentStep))
@@ -63,7 +66,7 @@ public abstract class PaySimState extends SimState {
 
     private void initCounters() {
         for (String action : ActionTypes.getActions()) {
-            for (ClientActionProfile clientActionProfile : Parameters.clientsProfiles.getProfilesFromAction(action)) {
+            for (ClientActionProfile clientActionProfile : parameters.clientsProfiles.getProfilesFromAction(action)) {
                 countProfileAssignment.put(clientActionProfile, 0);
             }
         }
@@ -73,35 +76,35 @@ public abstract class PaySimState extends SimState {
         System.out.println("Init - Seed " + seed());
 
         //Add the merchants
-        System.out.println("NbMerchants: " + (int) (Parameters.nbMerchants * Parameters.multiplier));
-        for (int i = 0; i < Parameters.nbMerchants * Parameters.multiplier; i++) {
-            Merchant m = new Merchant(generateId());
+        System.out.println("NbMerchants: " + (int) (parameters.nbMerchants * parameters.multiplier));
+        for (int i = 0; i < parameters.nbMerchants * parameters.multiplier; i++) {
+            Merchant m = new Merchant(generateId(), this.getParameters());
             merchants.add(m);
         }
 
         //Add the fraudsters
-        System.out.println("NbFraudsters: " + (int) (Parameters.nbFraudsters * Parameters.multiplier));
-        for (int i = 0; i < Parameters.nbFraudsters * Parameters.multiplier; i++) {
-            Fraudster f = new Fraudster(generateId());
+        System.out.println("NbFraudsters: " + (int) (parameters.nbFraudsters * parameters.multiplier));
+        for (int i = 0; i < parameters.nbFraudsters * parameters.multiplier; i++) {
+            Fraudster f = new Fraudster(generateId(), parameters);
             fraudsters.add(f);
             schedule.scheduleRepeating(f);
         }
 
         //Add the banks
-        System.out.println("NbBanks: " + Parameters.nbBanks);
-        for (int i = 0; i < Parameters.nbBanks; i++) {
-            Bank b = new Bank(generateId());
+        System.out.println("NbBanks: " + parameters.nbBanks);
+        for (int i = 0; i < parameters.nbBanks; i++) {
+            Bank b = new Bank(generateId(), this.getParameters());
             banks.add(b);
         }
 
         //Add the clients
-        System.out.println("NbClients: " + (int) (Parameters.nbClients * Parameters.multiplier));
-        for (int i = 0; i < Parameters.nbClients * Parameters.multiplier; i++) {
+        System.out.println("NbClients: " + (int) (parameters.nbClients * parameters.multiplier));
+        for (int i = 0; i < parameters.nbClients * parameters.multiplier; i++) {
             Client c = new Client(this);
             clients.add(c);
         }
 
-        NetworkDrug.createNetwork(this, Parameters.typologiesFolder + TypologiesFiles.drugNetworkOne);
+        NetworkDrug.createNetwork(this, parameters.typologiesFolder + TypologiesFiles.drugNetworkOne);
 
         // Do not write code under this part otherwise clients will not be used in simulation
         // Schedule clients to act at each step of the simulation
@@ -113,7 +116,7 @@ public abstract class PaySimState extends SimState {
     public Map<String, ClientActionProfile> pickNextClientProfile() {
         Map<String, ClientActionProfile> profile = new HashMap<>();
         for (String action : ActionTypes.getActions()) {
-            ClientActionProfile clientActionProfile = Parameters.clientsProfiles.pickNextActionProfile(action);
+            ClientActionProfile clientActionProfile = parameters.clientsProfiles.pickNextActionProfile(action);
 
             profile.put(action, clientActionProfile);
 
@@ -159,15 +162,15 @@ public abstract class PaySimState extends SimState {
     // XXX: The next few methods fudge {currentStep} to an int for now,
     //      manually asserting in runSimulation()
     public int getStepTargetCount() {
-        return Parameters.stepsProfiles.getTargetCount((int) currentStep);
+        return parameters.stepsProfiles.getTargetCount((int) currentStep);
     }
 
     public Map<String, Double> getStepProbabilities() {
-        return Parameters.stepsProfiles.getProbabilitiesPerStep((int) currentStep);
+        return parameters.stepsProfiles.getProbabilitiesPerStep((int) currentStep);
     }
 
     public StepActionProfile getStepAction(String action) {
-        return Parameters.stepsProfiles.getActionForStep((int) currentStep, action);
+        return parameters.stepsProfiles.getActionForStep((int) currentStep, action);
     }
 
     public List<Client> getClients() {
@@ -178,4 +181,7 @@ public abstract class PaySimState extends SimState {
         clients.add(c);
     }
 
+    public Parameters getParameters() {
+        return parameters;
+    }
 }

@@ -1,6 +1,9 @@
 package org.paysim.actors;
 
+import org.paysim.parameters.Parameters;
+
 public abstract class SuperActor {
+    protected final Parameters parameters;
     private final String name;
     private boolean isFraud = false;
     double balance = 0;
@@ -14,8 +17,9 @@ public abstract class SuperActor {
         MULE
     }
 
-    SuperActor(String name) {
+    SuperActor(String name, Parameters parameters) {
         this.name = name;
+        this.parameters = parameters;
     }
 
     void deposit(double amount) {

@@ -1,8 +1,9 @@
 package org.paysim.actors.networkdrugs;
 
 import ec.util.MersenneTwisterFast;
-import org.apache.tinkerpop.gremlin.structure.*;
-
+import org.apache.tinkerpop.gremlin.structure.Edge;
+import org.apache.tinkerpop.gremlin.structure.Graph;
+import org.apache.tinkerpop.gremlin.structure.Vertex;
 import org.paysim.PaySimState;
 import org.paysim.utils.GraphUtils;
 import org.paysim.utils.RandomCollection;

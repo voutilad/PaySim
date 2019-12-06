@@ -1,10 +1,10 @@
 package org.paysim.utils;
 
+import ec.util.MersenneTwisterFast;
+
 import java.util.Collection;
 import java.util.NavigableMap;
 import java.util.TreeMap;
-
-import ec.util.MersenneTwisterFast;
 
 public class RandomCollection<E> {
     private final NavigableMap<Double, E> map = new TreeMap<>();

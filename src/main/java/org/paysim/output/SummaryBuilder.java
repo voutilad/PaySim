@@ -1,11 +1,11 @@
 package org.paysim.output;
 
-import java.util.*;
-import java.util.function.Function;
-
 import org.paysim.base.StepActionProfile;
 import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.StepsProfiles;
+
+import java.util.*;
+import java.util.function.Function;
 
 class SummaryBuilder {
     private static final String SEPARATOR = "----------------------------------------------------";

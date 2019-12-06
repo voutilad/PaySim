@@ -1,7 +1,6 @@
 package org.paysim;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.paysim.parameters.Parameters;
 
@@ -21,18 +20,15 @@ import java.util.zip.GZIPInputStream;
 public class SanityCheckTest {
     private static final String testLog = "/test_rawLog.csv.gz";
 
-    @BeforeAll
-    static void init() {
-        Parameters.initParameters("PaySim.properties");
-    }
-
     @Test
     void sanityCheckIteratingPaySim() throws Exception {
+        Parameters parameters = new Parameters("PaySim.properties");
+
         Path path = Paths.get(getClass().getResource(testLog).toURI());
         GZIPInputStream gzis = new GZIPInputStream(Files.newInputStream(path));
         BufferedReader reader = new BufferedReader(new InputStreamReader(gzis));
 
-        IteratingPaySim sim = new IteratingPaySim();
+        IteratingPaySim sim = new IteratingPaySim(parameters);
         sim.run();
 
         // XXX: yes, this reads all lines into memory...

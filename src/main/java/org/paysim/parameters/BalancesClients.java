@@ -1,11 +1,10 @@
 package org.paysim.parameters;
 
-import java.util.*;
-
 import ec.util.MersenneTwisterFast;
-
 import org.paysim.utils.CSVReader;
 import org.paysim.utils.RandomCollection;
+
+import java.util.*;
 
 public class BalancesClients {
     private static final int COLUMN_LOW = 0, COLUMN_HIGH = 1, COLUMN_PROB = 2;

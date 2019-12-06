@@ -1,14 +1,16 @@
 package org.paysim.utils;
 
-import java.io.*;
+import org.apache.tinkerpop.gremlin.structure.*;
+import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLReader;
+import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-
-import org.apache.tinkerpop.gremlin.structure.*;
-import org.apache.tinkerpop.gremlin.structure.io.graphml.GraphMLReader;
-import org.apache.tinkerpop.gremlin.tinkergraph.structure.TinkerGraph;
 
 public class GraphUtils {
 

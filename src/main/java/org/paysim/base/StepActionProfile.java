@@ -1,8 +1,8 @@
 package org.paysim.base;
 
-import java.util.ArrayList;
-
 import org.paysim.output.Output;
+
+import java.util.ArrayList;
 
 public class StepActionProfile {
     private final String action;
