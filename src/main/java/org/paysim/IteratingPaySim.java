@@ -7,79 +7,103 @@ import java.util.*;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 import java.util.function.Consumer;
 
 public class IteratingPaySim extends PaySimState implements Iterator<Transaction> {
 
     private BlockingQueue<Transaction> queue;
-    private static int QUEUE_DEPTH = 100;
-    private boolean running = false;
+    private static int QUEUE_DEPTH = 200_000;
+    private SimulationWorker worker;
 
     public IteratingPaySim() {
         super(Parameters.getSeed());
         this.queue = new ArrayBlockingQueue<>(QUEUE_DEPTH);
-
-        // XXX: for now, force it to only do 4 while I work this out.
-        Parameters.nbSteps = 4;
+        this.worker = new SimulationWorker(this);
     }
 
-    private class Worker implements Runnable {
-        public boolean timeToDie = false;
+    private class SimulationWorker extends Thread {
+        private PaySimState state;
+        private volatile boolean running = false;
+
+        public SimulationWorker(PaySimState state) {
+            this.state = state;
+        }
 
         @Override
         public void run() {
-            try {
-                while (!timeToDie) {
-                    Transaction t = queue.poll(5, TimeUnit.SECONDS);
-                    System.out.println(t.toString());
-                }
-            } catch (InterruptedException e) {
-                System.err.println("Interrupted during simulation");
-            }
+            running = true;
+            state.runSimulation();
+            running = false;
+        }
+
+        public boolean isRunning() {
+            return this.running;
         }
     }
 
     @Override
     public void run() {
-        Worker w = new Worker();
-        Thread t = new Thread(w);
-        try {
-            t.start();
-            this.runSimulation();
-            w.timeToDie = true;
-            t.join(5000);
-        } catch (InterruptedException e) {
-            System.err.println(String.format("%s interrupted", this.getClass().getName()));
+        if (!worker.isRunning()) {
+            worker.start();
+        } else {
+            String msg = String.format("SimulationWorker %s is already started", worker);
+            throw new IllegalStateException(msg);
         }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
         System.out.println("Starting an instance of IteratingPaySim...");
         Parameters.initParameters("PaySim.properties");
 
+        long startTime = System.currentTimeMillis();
         IteratingPaySim sim = new IteratingPaySim();
         sim.run();
+        //sim.forEachRemaining(tx -> System.out.println(tx.toString()));
+        sim.forEachRemaining(tx -> { });
+        long totalTime = System.currentTimeMillis() - startTime;
+
+        System.out.println("Duration: " + totalTime / 1000.0 + " seconds");
         System.out.println("Bye 👋");
     }
 
     @Override
     public boolean hasNext() {
-        return false;
+        // XXX: assume thread running -> more data coming...this is a broken design
+        return worker.isRunning();
     }
 
     @Override
     public Transaction next() {
-        return null;
+        Transaction tx = null;
+
+        while (worker.isRunning() && tx == null) {
+            try {
+                tx = queue.poll(500, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException e) {
+                throw new NoSuchElementException();
+            }
+        }
+        return tx;
     }
 
     @Override
     public void remove() {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void forEachRemaining(Consumer<? super Transaction> action) {
+        Objects.requireNonNull(action);
+        while (hasNext()) {
+            try {
+                Transaction tx = next();
+                if (tx != null) {
+                    action.accept(tx);
+                }
+            } catch (NoSuchElementException nse) {
+                // XXX: End of simulation??
+            }
+        }
 
     }
 

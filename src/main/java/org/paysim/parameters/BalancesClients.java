@@ -1,9 +1,6 @@
 package org.paysim.parameters;
 
-import java.util.ArrayList;
-import java.util.InputMismatchException;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import java.util.*;
 
 import ec.util.MersenneTwisterFast;
 
@@ -14,14 +11,14 @@ public class BalancesClients {
     private static final int COLUMN_LOW = 0, COLUMN_HIGH = 1, COLUMN_PROB = 2;
     private static final int COLUMN_OVERDRAFT_LIMIT = 2;
 
-    private static RandomCollection<ArrayList<Double>> balanceRangePicker;
+    private static RandomCollection<List<Double>> balanceRangePicker;
     private static final NavigableMap<Double, Double> overdraftLimits = new TreeMap<>();
 
     public static void initBalanceClients(String filename) {
         balanceRangePicker = new RandomCollection<>();
-        ArrayList<String[]> parameters = CSVReader.read(filename);
+        List<String[]> parameters = CSVReader.read(filename);
         for (String[] paramLine : parameters) {
-            ArrayList<Double> balanceRange = new ArrayList<>();
+            List<Double> balanceRange = new ArrayList<>();
             balanceRange.add(Double.parseDouble(paramLine[COLUMN_LOW]));
             balanceRange.add(Double.parseDouble(paramLine[COLUMN_HIGH]));
 
@@ -30,7 +27,7 @@ public class BalancesClients {
     }
 
     public static void initOverdraftLimits(String filename){
-        ArrayList<String[]> parameters = CSVReader.read(filename);
+        List<String[]> parameters = CSVReader.read(filename);
         double valueLow, valueHigh;
         double lastValueHigh = - Double.MAX_VALUE;
 
@@ -61,7 +58,7 @@ public class BalancesClients {
     }
 
     public static double pickNextBalance(MersenneTwisterFast random) {
-        ArrayList<Double> balanceRange = balanceRangePicker.next();
+        List<Double> balanceRange = balanceRangePicker.next();
         double rangeSize = balanceRange.get(COLUMN_HIGH) - balanceRange.get(COLUMN_LOW);
 
         return balanceRange.get(COLUMN_LOW) + random.nextDouble() * rangeSize;

@@ -1,9 +1,6 @@
 package org.paysim.parameters;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import ec.util.MersenneTwisterFast;
 
@@ -16,7 +13,7 @@ public class ClientsProfiles {
     private Map<String, RandomCollection<ClientActionProfile>> profilePickerPerAction = new HashMap<>();
 
     public ClientsProfiles(String filename) {
-        ArrayList<String[]> parameters = CSVReader.read(filename);
+        List<String[]> parameters = CSVReader.read(filename);
 
         for (String action : ActionTypes.getActions()) {
             profilePickerPerAction.put(action, new RandomCollection<>());

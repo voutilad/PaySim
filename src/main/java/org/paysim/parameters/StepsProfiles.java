@@ -1,9 +1,6 @@
 package org.paysim.parameters;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -14,13 +11,13 @@ import org.paysim.utils.CSVReader;
 public class StepsProfiles {
     private static final int COLUMN_ACTION = 0, COLUMN_MONTH = 1, COLUMN_DAY = 2, COLUMN_HOUR = 3, COLUMN_COUNT = 4,
             COLUMN_SUM = 5, COLUMN_AVERAGE = 6, COLUMN_STD = 7, COLUMN_STEP = 8;
-    private ArrayList<HashMap<String, StepActionProfile>> profilePerStep;
-    private ArrayList<Map<String, Double>> probabilitiesPerStep = new ArrayList<>();
-    private ArrayList<Integer> stepTargetCount;
+    private List<HashMap<String, StepActionProfile>> profilePerStep;
+    private List<Map<String, Double>> probabilitiesPerStep = new ArrayList<>();
+    private List<Integer> stepTargetCount;
     private int totalTargetCount;
 
     public StepsProfiles(String filename, double multiplier, int nbSteps) {
-        ArrayList<String[]> parameters = CSVReader.read(filename);
+        List<String[]> parameters = CSVReader.read(filename);
 
         profilePerStep = new ArrayList<>();
         for (int i = 0; i < nbSteps; i++) {

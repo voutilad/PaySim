@@ -18,13 +18,13 @@ import java.util.List;
  */
 public class PaySim extends PaySimState {
 
-    private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "5"};
+    private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
 
     public final String simulationName;
     private int totalTransactionsMade = 0;
     private int stepParticipated = 0;
 
-    private ArrayList<Transaction> transactions = new ArrayList<>();
+    private List<Transaction> transactions = new ArrayList<>();
     private int currentStep;
 
     public static void main(String[] args) {
@@ -71,11 +71,11 @@ public class PaySim extends PaySimState {
             System.err.println(String.format("Reached MAX_INT number of steps (%d). Aborting.", Integer.MAX_VALUE));
             return false;
         }
-        currentStep = (int) stepNum;
+        currentStep = (int) stepNum + 1;
         writeOutputStep();
 
         if (stepNum % 100 == 100 - 1) {
-            System.out.println("Step " + stepNum);
+            System.out.println(" Step " + currentStep);
         } else {
             System.out.print("*");
         }
@@ -113,7 +113,7 @@ public class PaySim extends PaySimState {
     }
 
     private void writeOutputStep() {
-        ArrayList<Transaction> transactions = getTransactions();
+        List<Transaction> transactions = getTransactions();
 
         totalTransactionsMade += transactions.size();
 
@@ -134,10 +134,7 @@ public class PaySim extends PaySimState {
         return stepParticipated;
     }
 
-    public ArrayList<Transaction> getTransactions() {
+    public List<Transaction> getTransactions() {
         return transactions;
     }
-
-
-
 }
