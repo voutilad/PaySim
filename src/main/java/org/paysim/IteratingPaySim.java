@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 
 public class IteratingPaySim extends PaySimState implements Iterator<Transaction> {
@@ -17,37 +18,32 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     private BlockingQueue<Transaction> queue;
     private static int QUEUE_DEPTH = 200_000;
     private SimulationWorker worker;
+    private AtomicBoolean running = new AtomicBoolean();
 
     public IteratingPaySim(Parameters parameters) {
         super(parameters);
         this.queue = new ArrayBlockingQueue<>(QUEUE_DEPTH);
-        this.worker = new SimulationWorker(this);
+        worker = new SimulationWorker(this);
     }
 
-    private class SimulationWorker extends Thread {
-        private PaySimState state;
-        private volatile boolean running = false;
-
-        public SimulationWorker(PaySimState state) {
+    private class SimulationWorker implements Runnable {
+        private IteratingPaySim state;
+        public SimulationWorker(IteratingPaySim state) {
             this.state = state;
         }
 
         @Override
         public void run() {
-            running = true;
             state.runSimulation();
-            running = false;
-        }
-
-        public boolean isRunning() {
-            return this.running;
+            state.setRunning(false);
         }
     }
 
     @Override
-    public void run() {
-        if (!worker.isRunning()) {
-            worker.start();
+    public synchronized void run() {
+        if (running.compareAndSet(false, true)) {
+            final Thread t = new Thread(worker, "SimulationWorker");
+            t.start();
         } else {
             String msg = String.format("SimulationWorker %s is already started", worker);
             throw new IllegalStateException(msg);
@@ -71,16 +67,17 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
 
     @Override
     public boolean hasNext() {
-        // XXX: assume thread running -> more data coming...this is a broken design
-        return worker.isRunning();
+        // XXX: assume simulation running -> more data coming...this is a broken design
+        return running.get();
     }
 
     @Override
     public Transaction next() {
         Transaction tx = null;
 
-        while (worker.isRunning() && tx == null) {
+        while (running.get() && tx == null) {
             try {
+                // XXX: arbitrarily picked 500ms
                 tx = queue.poll(500, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 throw new NoSuchElementException();
@@ -121,9 +118,12 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
         });
     }
 
-    @Override
-    public boolean onStep(long stepNum) {
-        return true;
+    protected void setRunning(boolean newValue) {
+        running.set(newValue);
     }
 
+    @Override
+    public boolean onStep(long stepNum) {
+        return running.get();
+    }
 }

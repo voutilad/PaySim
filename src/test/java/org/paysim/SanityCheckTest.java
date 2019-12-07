@@ -1,6 +1,7 @@
 package org.paysim;
 
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.paysim.parameters.Parameters;
 
@@ -20,10 +21,24 @@ import java.util.zip.GZIPInputStream;
 public class SanityCheckTest {
     private static final String testLog = "/test_rawLog.csv.gz";
 
+    private Parameters parameters;
+
+    @BeforeEach
+    void setup() {
+        parameters = new Parameters("PaySim.properties");
+    }
+
+    @Test
+    void throwsExceptionIfRunningTwice() {
+        Assertions.assertThrows(IllegalStateException.class, () ->{
+            IteratingPaySim sim = new IteratingPaySim(parameters);
+            sim.run();
+            sim.run();
+        });
+    }
+
     @Test
     void sanityCheckIteratingPaySim() throws Exception {
-        Parameters parameters = new Parameters("PaySim.properties");
-
         Path path = Paths.get(getClass().getResource(testLog).toURI());
         GZIPInputStream gzis = new GZIPInputStream(Files.newInputStream(path));
         BufferedReader reader = new BufferedReader(new InputStreamReader(gzis));
