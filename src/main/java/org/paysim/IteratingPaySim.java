@@ -17,13 +17,20 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
 
     private BlockingQueue<Transaction> queue;
     private static int QUEUE_DEPTH = 200_000;
+
     private SimulationWorker worker;
+    protected static String WORKER_NAME = "SimulationWorker";
+
     private AtomicBoolean running = new AtomicBoolean();
 
-    public IteratingPaySim(Parameters parameters) {
+    public IteratingPaySim(Parameters parameters, int queueDepth) {
         super(parameters);
-        this.queue = new ArrayBlockingQueue<>(QUEUE_DEPTH);
+        this.queue = new ArrayBlockingQueue<>(queueDepth);
         worker = new SimulationWorker(this);
+    }
+
+    public IteratingPaySim(Parameters parameters) {
+        this(parameters, QUEUE_DEPTH);
     }
 
     private class SimulationWorker implements Runnable {
@@ -42,7 +49,7 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     @Override
     public synchronized void run() {
         if (running.compareAndSet(false, true)) {
-            final Thread t = new Thread(worker, "SimulationWorker");
+            final Thread t = new Thread(worker, WORKER_NAME);
             t.start();
         } else {
             String msg = String.format("SimulationWorker %s is already started", worker);
@@ -108,18 +115,31 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     }
 
     @Override
-    public void onTransactions(List<Transaction> transactions) {
-        transactions.forEach(tx -> {
-            try {
-                this.queue.put(tx);
-            } catch (InterruptedException e) {
-                System.err.println("Interrupted while adding tx to queue, skipping.");
-            }
-        });
+    public boolean onTransactions(List<Transaction> transactions) {
+        if (running.get()) {
+            transactions.forEach(tx -> {
+                try {
+                    this.queue.put(tx);
+                } catch (InterruptedException e) {
+                    System.err.println("Interrupted while adding tx to queue, skipping.");
+                }
+            });
+            return true;
+        }
+        return false;
     }
 
     protected void setRunning(boolean newValue) {
         running.set(newValue);
+    }
+
+    public void abort() throws IllegalStateException {
+        if (!running.compareAndSet(true, false)) {
+            throw new IllegalStateException("Cannot stop simulation when state isn't running");
+        }
+
+        // XXX: a sloppy drain implementation...bad idea?
+        queue.clear();
     }
 
     @Override

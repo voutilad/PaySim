@@ -124,6 +124,14 @@ public class Transaction implements Serializable {
         isSuccessful = successful;
     }
 
+    public SuperActor.Type getOrigType() {
+        return typeOrig;
+    }
+
+    public SuperActor.Type getDestType() {
+        return typeDest;
+    }
+
     @Override
     public String toString(){
         ArrayList<String> properties = new ArrayList<>();

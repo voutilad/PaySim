@@ -41,7 +41,7 @@ public abstract class PaySimState extends SimState {
         parameters.clientsProfiles.setRandom(super.random);
     }
 
-    public abstract void onTransactions(List<Transaction> transactions);
+    public abstract boolean onTransactions(List<Transaction> transactions);
 
     protected abstract boolean onStep(long stepNum);
 

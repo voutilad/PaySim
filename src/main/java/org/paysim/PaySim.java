@@ -61,8 +61,8 @@ public class PaySim extends PaySimState {
     }
 
     @Override
-    public void onTransactions(List<Transaction> transactions) {
-        this.transactions.addAll(transactions);
+    public boolean onTransactions(List<Transaction> transactions) {
+        return this.transactions.addAll(transactions);
     }
 
     @Override

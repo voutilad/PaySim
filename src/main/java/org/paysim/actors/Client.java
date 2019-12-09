@@ -64,7 +64,10 @@ public class Client extends SuperActor implements Steppable {
                 double amount = pickAmount(random, action, stepAmountProfile);
 
                 List<Transaction> transactions = makeTransaction(paySim, step, action, amount);
-                paySim.onTransactions(transactions);
+                if (!paySim.onTransactions(transactions)) {
+                    // XXX: For now, let's try just returning as a clean way to slowly abort
+                    return;
+                }
             }
         }
     }

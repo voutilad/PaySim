@@ -10,6 +10,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
@@ -35,6 +36,25 @@ public class SanityCheckTest {
             sim.run();
             sim.run();
         });
+    }
+
+    @Test
+    void canAbortASimulation() throws InterruptedException {
+        IteratingPaySim sim = new IteratingPaySim(parameters, 1);
+        sim.run();
+        Assertions.assertNotNull(sim.next());
+        sim.abort();
+        Assertions.assertNull(sim.next());
+        Assertions.assertFalse(sim.hasNext());
+
+        // XXX: This sucks, but we need to wait some time for the sim to finish since
+        // there's no current way to pull the plug other than waiting for it to try
+        Thread.sleep(500);
+        int cnt = Thread.activeCount();
+        Thread[] threads = new Thread[cnt];
+        Thread.enumerate(threads);
+        Assertions.assertFalse(Arrays.stream(threads)
+                .anyMatch(thread -> thread.getName().startsWith(IteratingPaySim.WORKER_NAME)));
     }
 
     @Test
