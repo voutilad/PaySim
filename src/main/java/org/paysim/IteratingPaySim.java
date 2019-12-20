@@ -64,8 +64,7 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
         long startTime = System.currentTimeMillis();
         IteratingPaySim sim = new IteratingPaySim(parameters);
         sim.run();
-        //sim.forEachRemaining(tx -> System.out.println(tx.toString()));
-        sim.forEachRemaining(tx -> { });
+        sim.forEachRemaining(tx -> System.out.println(tx.toString()));
         long totalTime = System.currentTimeMillis() - startTime;
 
         System.out.println("Duration: " + totalTime / 1000.0 + " seconds");
@@ -75,7 +74,7 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     @Override
     public boolean hasNext() {
         // XXX: assume simulation running -> more data coming...this is a broken design
-        return running.get();
+        return running.get() || !queue.isEmpty();
     }
 
     @Override
