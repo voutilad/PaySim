@@ -61,6 +61,7 @@ public class Fraudster extends SuperActor implements Steppable {
                 }
             }
             c.setFraud(false);
+            paysim.onTransactions(transactions);
         }
     }
 
