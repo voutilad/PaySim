@@ -1,5 +1,42 @@
-This is a fork of PaySim that ...
+![](https://github.com/voutilad/paysim/workflows/Java%20CI/badge.svg)
 
+This is a fork of PaySim designed for embedding. Key changes from the original include:
+
+- `Parameters` used statics for simulation params preventing concurrent usage and easy testing, so remove reliance on statics.
+- Relying on deducing the type of the actor based on their name prefix was annoying, so explicitly track a `SuperActor.Type` making it easier to know without string nonsense
+- PaySim was originally implemented as a single class relying on file IO, so abstract out the common parts (`PaySimState`) allowing for creation of an implementation that doesn't require writing simulation results to the file system
+- Embedding PaySim was hard due to the file IO requirements, so in conjunction with `PaySimState` implement an in-memory implementation that produces consumable results. (Current implementation is a `java.util.Iterator<Transaction>` that allows the simulation to get ahead of the consumer but 200k transactions using a `java.util.concurrent.ArrayBlockingQueue` as a buffer.)
+
+## Getting Started
+There are a few prerequisites:
+
+- Get and install a recent JDK 11 instance for your platform
+- You'll need to grab my fork of [mason](https://github.com/voutilad/mason) and install it in your local maven repo. (Simply `mvn install`.)
+
+### Embedding
+You can build a standalone uberjar using `mvn package`. It'll produce a jar in `./target` containing all dependencies.
+
+By default, the original PaySim class is wired up as the entry point, so the following will execute a simulation outputting to the file system:
+```bash
+$ java -jar target/paysim-2.0-voutilad-4.jar
+```
+
+Feel free to take the jar and add it to your project or application.
+
+### Extending
+If you'd like to create your own PaySim customization, extend the abstract `PaySimState` class.
+
+See `org.paysim.IteratingPaySim` as an example.
+
+## About the required Properties files
+Currently PaySim expects a handful of properties files to initialize the simulation state. You need to provide:
+
+- PaySim.properties -- the primary settings file
+- Supporting properties files -- see the `paramFiles` directory
+
+I recommend copying the existing ones in the project and distributing them with the jar.
+
+> Note: the current version of PaySim requires aggregate financial transaction data to generate the simulated transactions. As such, it's capped at ~720 steps for now.
 
 ---
 # Original README.md
