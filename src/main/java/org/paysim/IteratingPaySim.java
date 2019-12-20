@@ -73,17 +73,15 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
 
     @Override
     public boolean hasNext() {
-        // XXX: assume simulation running -> more data coming...this is a broken design
-        return running.get() || !queue.isEmpty();
+        return !queue.isEmpty() || running.get();
     }
 
     @Override
     public Transaction next() {
         Transaction tx = null;
 
-        while (running.get() && tx == null) {
+        while (hasNext() && tx == null) {
             try {
-                // XXX: arbitrarily picked 500ms
                 tx = queue.poll(500, TimeUnit.MILLISECONDS);
             } catch (InterruptedException e) {
                 throw new NoSuchElementException();
