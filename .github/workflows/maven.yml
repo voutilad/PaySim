@@ -6,11 +6,15 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout mason
+        uses: actions/checkout@v2
         with:
           repository: voutilad/mason
           path: mason
-      - uses: actions/checkout@v2
+      - name: Checkout PaySim
+        uses: actions/checkout@v2
+        with:
+          path: paysim
       - name: Set up JDK 1.8
         uses: actions/setup-java@v1
         with:
@@ -18,4 +22,4 @@ jobs:
       - name: Install mason
         run: mvn install --file mason/pom.xml
       - name: Build PaySim
-        run: mvn -B package --file pom.xml
+        run: mvn -B package --file paysim/pom.xml
