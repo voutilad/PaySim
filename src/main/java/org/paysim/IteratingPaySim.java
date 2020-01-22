@@ -11,6 +11,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 public class IteratingPaySim extends PaySimState implements Iterator<Transaction> {
@@ -22,6 +23,7 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     protected static String WORKER_NAME = "SimulationWorker";
 
     private AtomicBoolean running = new AtomicBoolean();
+    private AtomicInteger stepCounter = new AtomicInteger(0);
 
     public IteratingPaySim(Parameters parameters, int queueDepth) {
         super(parameters);
@@ -49,6 +51,7 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     @Override
     public synchronized void run() {
         if (running.compareAndSet(false, true)) {
+            stepCounter.set(0);
             final Thread t = new Thread(worker, WORKER_NAME);
             t.start();
         } else {
@@ -64,7 +67,7 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
         long startTime = System.currentTimeMillis();
         IteratingPaySim sim = new IteratingPaySim(parameters);
         sim.run();
-        sim.forEachRemaining(tx -> System.out.println(tx.toString()));
+        sim.forEachRemaining(tx -> System.out.println(tx.getGlobalStep() + "," + tx.toString()));
         long totalTime = System.currentTimeMillis() - startTime;
 
         System.out.println("Duration: " + totalTime / 1000.0 + " seconds");
@@ -83,6 +86,9 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
         while (hasNext() && tx == null) {
             try {
                 tx = queue.poll(500, TimeUnit.MILLISECONDS);
+                if (tx != null) {
+                    tx.setGlobalStep(stepCounter.incrementAndGet());
+                }
             } catch (InterruptedException e) {
                 throw new NoSuchElementException();
             }

@@ -11,11 +11,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 /**
- * This is a naieve approach to sanity checking any logic changes to the
+ * This is a naive approach to sanity checking any logic changes to the
  * PaySimState base class and its derivatives using a "gold standard"
  * output from a known good version of PaySim run for <b>10 steps</b>.
  */
@@ -55,6 +58,17 @@ public class SanityCheckTest {
         Thread.enumerate(threads);
         Assertions.assertFalse(Arrays.stream(threads)
                 .anyMatch(thread -> thread.getName().startsWith(IteratingPaySim.WORKER_NAME)));
+    }
+
+    @Test
+    void iteratingPaySimTracksGlobalStepOrder() throws Exception {
+        IteratingPaySim sim = new IteratingPaySim(parameters, 1);
+        sim.run();
+        final AtomicInteger lastStep = new AtomicInteger(0);
+        sim.forEachRemaining(tx ->
+            Assertions.assertTrue(
+                    tx.getGlobalStep() == lastStep.incrementAndGet(),
+                    "Each step is 1 greater than the last"));
     }
 
     @Test

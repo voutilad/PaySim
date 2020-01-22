@@ -9,6 +9,7 @@ import java.util.ArrayList;
 public class Transaction implements Serializable {
     private static final long serialVersionUID = 1L;
     private final int step;
+    private int globalStep = -1;
     private final String action;
     private final double amount;
 
@@ -78,6 +79,14 @@ public class Transaction implements Serializable {
 
     public boolean isFraud() {
         return isFraud;
+    }
+
+    public int getGlobalStep() {
+        return globalStep;
+    }
+
+    public void setGlobalStep(int globalStep) {
+        this.globalStep = globalStep;
     }
 
     public int getStep() {
