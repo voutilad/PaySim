@@ -8,6 +8,8 @@ import org.paysim.base.Transaction;
 import org.paysim.parameters.Parameters;
 import org.paysim.parameters.StepsProfiles;
 import org.paysim.utils.DatabaseHandler;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,6 +23,8 @@ public class Output {
     public static final String OUTPUT_SEPARATOR = ",", EOL_CHAR = System.lineSeparator();
     private static String filenameGlobalSummary, filenameParameters, filenameSummary, filenameRawLog,
             filenameStepAggregate, filenameClientProfiles, filenameFraudsters;
+
+    private static final Logger logger = LoggerFactory.getLogger(Output.class);
 
     public static void incrementalWriteRawLog(long step, List<Transaction> transactions) {
         String rawLogHeader = "step,action,amount,nameOrig,oldBalanceOrig,newBalanceOrig,nameDest,oldBalanceDest,newBalanceDest,isFraud,isFlaggedFraud,isUnauthorizedOverdraft";
@@ -129,7 +133,7 @@ public class Output {
                 paySim.getClients().size() + "," + totalErrorRate;
         writeGlobalSummary(summary);
 
-        System.out.println("Nb of clients: " + paySim.getClients().size() + " - Nb of steps with transactions: " + paySim.getStepParticipated());
+        logger.info("Nb of clients: " + paySim.getClients().size() + " - Nb of steps with transactions: " + paySim.getStepParticipated());
     }
 
     private static void writeGlobalSummary(String summary) {

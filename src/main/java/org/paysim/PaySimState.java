@@ -13,6 +13,8 @@ import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.BalancesClients;
 import org.paysim.parameters.Parameters;
 import org.paysim.parameters.TypologiesFiles;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sim.engine.SimState;
 
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.Map;
 public abstract class PaySimState extends SimState {
     public static final double PAYSIM_VERSION = 2.0;
 
+    private final Logger logger = LoggerFactory.getLogger(PaySimState.class);
     protected Parameters parameters;
 
     protected List<Client> clients = new ArrayList<>();
@@ -73,17 +76,17 @@ public abstract class PaySimState extends SimState {
     }
 
     private void initActors() {
-        System.out.println("Init - Seed " + seed());
+        logger.info("Init - Seed " + seed());
 
         //Add the merchants
-        System.out.println("NbMerchants: " + (int) (parameters.nbMerchants * parameters.multiplier));
+        logger.info("NbMerchants: " + (int) (parameters.nbMerchants * parameters.multiplier));
         for (int i = 0; i < parameters.nbMerchants * parameters.multiplier; i++) {
             Merchant m = new Merchant(generateId(), this.getParameters());
             merchants.add(m);
         }
 
         //Add the fraudsters
-        System.out.println("NbFraudsters: " + (int) (parameters.nbFraudsters * parameters.multiplier));
+        logger.info("NbFraudsters: " + (int) (parameters.nbFraudsters * parameters.multiplier));
         for (int i = 0; i < parameters.nbFraudsters * parameters.multiplier; i++) {
             Fraudster f = new Fraudster(generateId(), parameters);
             fraudsters.add(f);
@@ -91,14 +94,14 @@ public abstract class PaySimState extends SimState {
         }
 
         //Add the banks
-        System.out.println("NbBanks: " + parameters.nbBanks);
+        logger.info("NbBanks: " + parameters.nbBanks);
         for (int i = 0; i < parameters.nbBanks; i++) {
             Bank b = new Bank(generateId(), this.getParameters());
             banks.add(b);
         }
 
         //Add the clients
-        System.out.println("NbClients: " + (int) (parameters.nbClients * parameters.multiplier));
+        logger.info("NbClients: " + (int) (parameters.nbClients * parameters.multiplier));
         for (int i = 0; i < parameters.nbClients * parameters.multiplier; i++) {
             Client c = new Client(this);
             clients.add(c);

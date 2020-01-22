@@ -1,10 +1,15 @@
 package org.paysim.parameters;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.FileInputStream;
 import java.util.Properties;
 
 
 public class Parameters {
+    private final Logger logger = LoggerFactory.getLogger(Parameters.class);
+
     private static String seedString;
     public final int seed;
     public final int nbClients, nbMerchants, nbBanks, nbFraudsters, nbSteps;
@@ -24,7 +29,7 @@ public class Parameters {
             props.load(new FileInputStream(propertiesFile));
         } catch (Exception e) {
             // TODO: refactor to throw exception
-            e.printStackTrace();
+            logger.error(String.format("error loading properties file: %s", propertiesFile), e);
         }
 
         seedString = String.valueOf(props.getProperty("seed"));

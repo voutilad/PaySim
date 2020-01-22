@@ -3,6 +3,8 @@ package org.paysim.output;
 import org.paysim.base.StepActionProfile;
 import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.StepsProfiles;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Function;
@@ -11,6 +13,7 @@ class SummaryBuilder {
     private static final String SEPARATOR = "----------------------------------------------------";
     private static final String FORMAT_CELL = "| %-15s";
     private static final List<String> HEADER = Arrays.asList("Estimator", "Action", "Error rate");
+    private static final Logger logger = LoggerFactory.getLogger(SummaryBuilder.class);
 
     public static double buildSummary(StepsProfiles targetStepsProfiles, StepsProfiles simulationStepsProfiles, StringBuilder summaryStrBuilder) {
         double totalErrorRate = 0;
@@ -22,9 +25,7 @@ class SummaryBuilder {
 
         totalErrorRate += objectiveFunctionSteps(targetStepsProfiles, simulationStepsProfiles, summaryStrBuilder);
 
-        summaryStrBuilder.append(Output.EOL_CHAR);
-
-        System.out.println(summaryStrBuilder);
+        logger.info(String.format("\n%s", summaryStrBuilder.toString()));
 
         return totalErrorRate;
     }

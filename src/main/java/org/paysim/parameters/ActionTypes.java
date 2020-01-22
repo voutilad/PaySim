@@ -1,11 +1,14 @@
 package org.paysim.parameters;
 
 import org.paysim.utils.CSVReader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 public class ActionTypes {
     private static final int COLUMN_ACTION = 0, COLUMN_OCCURRENCES = 1;
+    private static final Logger logger = LoggerFactory.getLogger(ActionTypes.class);
     private static Set<String> actions = new TreeSet<>();
     private static Map<String, Integer> maxOccurrencesPerAction = new HashMap<>();
 
@@ -28,7 +31,7 @@ public class ActionTypes {
             }
         }
         if (loaded != actions.size()) {
-            System.out.println("Warning : Missing action in " + filename);
+            logger.warn(String.format("missing action in %s", filename));
         }
     }
 

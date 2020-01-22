@@ -336,6 +336,10 @@ public class Client extends SuperActor implements Steppable {
     }
 
     private boolean isDetectedAsFraud(double amount) {
+        /* XXX: It's not clear what the thinking is behind this method...why is there some native "fraud detection?"
+                Historically, it seems there was a method for checking if a balance is rapidly decreasing, so not
+                sure what the point is other than to simulate a crude fraud detection native to the system?
+        */
         boolean isFraudulentAccount = false;
         if (this.countTransferTransactions >= MIN_NB_TRANSFER_FOR_FRAUD) {
             if (this.balanceMax - this.balance - amount > parameters.transferLimit * 2.5) {

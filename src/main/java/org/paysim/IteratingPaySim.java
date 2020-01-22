@@ -2,6 +2,8 @@ package org.paysim;
 
 import org.paysim.base.Transaction;
 import org.paysim.parameters.Parameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Iterator;
 import java.util.List;
@@ -16,6 +18,7 @@ import java.util.function.Consumer;
 
 public class IteratingPaySim extends PaySimState implements Iterator<Transaction> {
 
+    private final Logger logger = LoggerFactory.getLogger(IteratingPaySim.class);
     private BlockingQueue<Transaction> queue;
     private static int QUEUE_DEPTH = 200_000;
 
@@ -37,14 +40,18 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
 
     private class SimulationWorker implements Runnable {
         private IteratingPaySim state;
+        private final Logger logger = LoggerFactory.getLogger(SimulationWorker.class);
+
         public SimulationWorker(IteratingPaySim state) {
             this.state = state;
         }
 
         @Override
         public void run() {
+            logger.debug("starting");
             state.runSimulation();
             state.setRunning(false);
+            logger.debug("finished");
         }
     }
 
@@ -54,24 +61,27 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
             stepCounter.set(0);
             final Thread t = new Thread(worker, WORKER_NAME);
             t.start();
+            logger.debug(String.format("started worker thread: %s", t.getName()));
         } else {
-            String msg = String.format("SimulationWorker %s is already started", worker);
+            final String msg = String.format("SimulationWorker %s is already started", worker);
+            logger.warn(msg);
             throw new IllegalStateException(msg);
         }
     }
 
     public static void main(String[] args) {
-        System.out.println("Starting an instance of IteratingPaySim...");
+        final Logger logger = LoggerFactory.getLogger(IteratingPaySim.class);
+        logger.info("Starting an instance of IteratingPaySim...");
         Parameters parameters = new Parameters("PaySim.properties");
 
         long startTime = System.currentTimeMillis();
         IteratingPaySim sim = new IteratingPaySim(parameters);
         sim.run();
-        sim.forEachRemaining(tx -> System.out.println(tx.getGlobalStep() + "," + tx.toString()));
+        sim.forEachRemaining(tx -> logger.info(tx.getGlobalStep() + "," + tx.toString()));
         long totalTime = System.currentTimeMillis() - startTime;
 
-        System.out.println("Duration: " + totalTime / 1000.0 + " seconds");
-        System.out.println("Bye 👋");
+        logger.info("Duration: " + totalTime / 1000.0 + " seconds");
+        logger.info("Bye 👋");
     }
 
     @Override
@@ -98,6 +108,7 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
 
     @Override
     public void remove() {
+        logger.error("remove() method is unsupported");
         throw new UnsupportedOperationException();
     }
 
@@ -124,7 +135,7 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
                 try {
                     this.queue.put(tx);
                 } catch (InterruptedException e) {
-                    System.err.println("Interrupted while adding tx to queue, skipping.");
+                    logger.error("interrupted while adding tx to queue, skipping.", e);
                 }
             });
             return true;
@@ -138,7 +149,9 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
 
     public void abort() throws IllegalStateException {
         if (!running.compareAndSet(true, false)) {
-            throw new IllegalStateException("Cannot stop simulation when state isn't running");
+            final String msg = "cannot stop simulation when state isn't running";
+            logger.warn(msg);
+            throw new IllegalStateException(msg);
         }
 
         // XXX: a sloppy drain implementation...bad idea?

@@ -4,6 +4,8 @@ import ec.util.MersenneTwisterFast;
 import org.paysim.base.ClientActionProfile;
 import org.paysim.utils.CSVReader;
 import org.paysim.utils.RandomCollection;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ClientsProfiles {
+    final private Logger logger = LoggerFactory.getLogger(ClientsProfiles.class);
     private static final int COLUMN_ACTION = 0, COLUMN_LOW = 1, COLUMN_HIGH = 2, COLUMN_AVG = 3, COLUMN_STD = 4, COLUMN_FREQ = 5;
     private Map<String, RandomCollection<ClientActionProfile>> profilePickerPerAction = new HashMap<>();
 
@@ -35,7 +38,7 @@ public class ClientsProfiles {
 
         for (RandomCollection profile: profilePickerPerAction.values()) {
             if (profile.isEmpty()){
-                System.out.println("Warning : Missing action in " + filename);
+                logger.warn("missing action in " + filename);
                 break;
             }
         }
