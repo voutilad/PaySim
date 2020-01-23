@@ -4,6 +4,7 @@ import org.paysim.base.Transaction;
 import org.paysim.parameters.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.spi.LoggerFactoryBinder;
 
 import java.util.Iterator;
 import java.util.List;
@@ -85,18 +86,18 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     }
 
     public static void main(String[] args) {
-        final Logger logger = LoggerFactory.getLogger(IteratingPaySim.class);
-        logger.info("Starting an instance of IteratingPaySim...");
+        // Use stdout directly in the case we're running as the main entry point
+        System.out.println("Starting an instance of IteratingPaySim...");
         Parameters parameters = new Parameters("PaySim.properties");
 
         long startTime = System.currentTimeMillis();
         IteratingPaySim sim = new IteratingPaySim(parameters);
         sim.run();
-        sim.forEachRemaining(tx -> logger.info(tx.getGlobalStep() + "," + tx.toString()));
+        sim.forEachRemaining(tx -> System.out.println(tx.getGlobalStep() + "," + tx.toString()));
         long totalTime = System.currentTimeMillis() - startTime;
 
-        logger.info("Duration: " + totalTime / 1000.0 + " seconds");
-        logger.info("Bye 👋");
+        System.out.println("Duration: " + totalTime / 1000.0 + " seconds");
+        System.out.println("Bye 👋");
     }
 
     @Override

@@ -3,8 +3,6 @@ package org.paysim;
 import org.paysim.base.Transaction;
 import org.paysim.output.Output;
 import org.paysim.parameters.Parameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -29,11 +27,8 @@ public class PaySim extends PaySimState {
     private List<Transaction> transactions = new ArrayList<>();
     private int currentStep;
 
-    private final Logger logger = LoggerFactory.getLogger(PaySim.class);
-
     public static void main(String[] args) {
-        final Logger logger = LoggerFactory.getLogger(PaySim.class);
-        logger.info(String.format("PAYSIM: Financial Simulator v%s", PAYSIM_VERSION));
+        System.out.println("PAYSIM: Financial Simulator v" + PAYSIM_VERSION);
         if (args.length < 4) {
             args = DEFAULT_ARGS;
         }
@@ -73,33 +68,35 @@ public class PaySim extends PaySimState {
     @Override
     protected boolean onStep(long stepNum) {
         if (stepNum > Integer.MAX_VALUE) {
-            logger.error(String.format("Reached MAX_INT number of steps (%d). Aborting.", Integer.MAX_VALUE));
+            System.err.println(String.format("Reached MAX_INT number of steps (%d). Aborting.", Integer.MAX_VALUE));
             return false;
         }
         currentStep = (int) stepNum + 1;
         writeOutputStep();
 
         if (stepNum % 100 == 100 - 1) {
-            logger.info("Step " + currentStep);
+            System.out.println(" Step " + currentStep);
+        } else {
+            System.out.print("*");
         }
-
         return true;
     }
 
     @Override
     public void run() {
-        logger.info("Starting PaySim Running for " + parameters.nbSteps + " steps.");
+        System.out.println("\nStarting PaySim Running for " + parameters.nbSteps + " steps.");
         long startTime = System.currentTimeMillis();
 
         runSimulation();
 
-        logger.info("Finished running " + currentStep + " steps ");
+        System.out.println("\nFinished running " + currentStep + " steps ");
         finish();
 
         double total = System.currentTimeMillis() - startTime;
         total = total / 1000 / 60;
-        logger.info("It took: " + total + " minutes to execute the simulation");
-        logger.info("Simulation name: " + simulationName);
+        System.out.println("It took: " + total + " minutes to execute the simulation");
+        System.out.println("Simulation name: " + simulationName);
+        System.out.println();
     }
 
     public void finish() {
