@@ -14,8 +14,8 @@ public class Fraudster extends SuperActor implements Steppable {
     private double profit = 0;
     private int nbVictims = 0;
 
-    public Fraudster(String name, Parameters parameters) {
-        super(FRAUDSTER_IDENTIFIER + name, parameters);
+    public Fraudster(String id, String name, Parameters parameters) {
+        super(FRAUDSTER_IDENTIFIER + id, name, parameters);
     }
 
     @Override
@@ -30,7 +30,7 @@ public class Fraudster extends SuperActor implements Steppable {
         int step = (int) state.schedule.getSteps();
 
         if (paysim.random.nextDouble() < parameters.fraudProbability) {
-            Client c = paysim.pickRandomClient(getName());
+            Client c = paysim.pickRandomClient(getId());
             c.setFraud(true);
             double balance = c.getBalance();
             // create mule client
@@ -38,7 +38,8 @@ public class Fraudster extends SuperActor implements Steppable {
                 int nbTransactions = (int) Math.ceil(balance / parameters.transferLimit);
                 for (int i = 0; i < nbTransactions; i++) {
                     boolean transferFailed;
-                    Mule muleClient = new Mule(paysim.generateId(), paysim.pickRandomBank(), parameters);
+                    // TODO: resolve name of mule here?
+                    Mule muleClient = new Mule(paysim.generateUniqueClientId(), paysim.generateClientName(), paysim.pickRandomBank(), parameters);
                     muleClient.setFraud(true);
                     if (balance > parameters.transferLimit) {
                         Transaction t = c.handleTransfer(paysim, step, parameters.transferLimit, muleClient);
@@ -69,7 +70,7 @@ public class Fraudster extends SuperActor implements Steppable {
     public String toString() {
         ArrayList<String> properties = new ArrayList<>();
 
-        properties.add(getName());
+        properties.add(getId());
         properties.add(Integer.toString(nbVictims));
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, profit));
 

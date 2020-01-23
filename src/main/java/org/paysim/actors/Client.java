@@ -32,13 +32,13 @@ public class Client extends SuperActor implements Steppable {
     private double expectedAvgTransaction = 0;
     private double initialBalance;
 
-    Client(String name, Bank bank, Parameters parameters) {
-        super(CLIENT_IDENTIFIER + name, parameters);
+    Client(String id, String name, Bank bank, Parameters parameters) {
+        super(CLIENT_IDENTIFIER + id, name, parameters);
         this.bank = bank;
     }
 
     public Client(PaySimState paySim) {
-        super(CLIENT_IDENTIFIER + paySim.generateId(), paySim.getParameters());
+        super(CLIENT_IDENTIFIER + paySim.generateUniqueClientId(), paySim.generateClientName(), paySim.getParameters());
         this.bank = paySim.pickRandomBank();
         this.clientProfile = new ClientProfile(paySim.pickNextClientProfile(), paySim.getRNG());
         this.clientWeight = ((double) clientProfile.getClientTargetCount()) /  paySim.getParameters().stepsProfiles.getTotalTargetCount();
@@ -192,7 +192,7 @@ public class Client extends SuperActor implements Steppable {
                 transactions.add(handlePayment(state, step, amount));
                 break;
             case TRANSFER:
-                Client clientTo = state.pickRandomClient(getName());
+                Client clientTo = state.pickRandomClient(getId());
                 double reducedAmount = amount;
                 boolean lastTransferFailed = false;
 

@@ -47,11 +47,11 @@ public class Transaction implements Serializable {
         this.step = step;
         this.action = action;
         this.amount = amount;
-        this.nameOrig = originator.getName();
+        this.nameOrig = originator.getId();
         this.typeOrig = originator.getType();
         this.oldBalanceOrig = oldBalanceOrig;
         this.newBalanceOrig = newBalanceOrig;
-        this.nameDest = destination.getName();
+        this.nameDest = destination.getId();
         this.typeDest = destination.getType();
         this.oldBalanceDest = oldBalanceDest;
         this.newBalanceDest = newBalanceDest;

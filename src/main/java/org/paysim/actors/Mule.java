@@ -7,8 +7,8 @@ import org.paysim.parameters.Parameters;
 public class Mule extends Client {
     private static final String MULE_IDENTIFIER = "C";
 
-    public Mule(String name, Bank bank, Parameters parameters) {
-        super(MULE_IDENTIFIER + name, bank, parameters);
+    public Mule(String id, String name, Bank bank, Parameters parameters) {
+        super(MULE_IDENTIFIER + id, name, bank, parameters);
         this.overdraftLimit = 0;
     }
 

@@ -4,7 +4,8 @@ import org.paysim.parameters.Parameters;
 
 public abstract class SuperActor {
     protected final Parameters parameters;
-    private final String name;
+    private final String id;
+    private String name;
     private boolean isFraud = false;
     double balance = 0;
     double overdraftLimit;
@@ -17,7 +18,8 @@ public abstract class SuperActor {
         MULE
     }
 
-    SuperActor(String name, Parameters parameters) {
+    SuperActor(String id, String name, Parameters parameters) {
+        this.id = id;
         this.name = name;
         this.parameters = parameters;
     }
@@ -50,6 +52,10 @@ public abstract class SuperActor {
         return balance;
     }
 
+    public String getId() {
+        return id;
+    }
+
     public String getName() {
         return name;
     }
@@ -58,6 +64,6 @@ public abstract class SuperActor {
 
     @Override
     public String toString() {
-        return String.format("%s [%s]", name, getType());
+        return String.format("%s [%s]", id, getType());
     }
 }

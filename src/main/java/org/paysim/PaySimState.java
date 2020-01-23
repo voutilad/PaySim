@@ -1,5 +1,6 @@
 package org.paysim;
 
+import com.devskiller.jfairy.Bootstrap;
 import ec.util.MersenneTwisterFast;
 import org.paysim.actors.Bank;
 import org.paysim.actors.Client;
@@ -17,10 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sim.engine.SimState;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public abstract class PaySimState extends SimState {
     public static final double PAYSIM_VERSION = 2.0;
@@ -33,7 +31,13 @@ public abstract class PaySimState extends SimState {
     protected List<Fraudster> fraudsters = new ArrayList<>();
     protected List<Bank> banks = new ArrayList<>();
 
+    protected Set<String> bankIds = new HashSet<>();
+    protected Set<String> merchantIds = new HashSet<>();
+    protected Set<String> clientIds = new HashSet<>();
+
     protected Map<ClientActionProfile, Integer> countProfileAssignment = new HashMap<>();
+
+    protected Bootstrap.Builder builder;
 
     long currentStep = 0;
 
@@ -42,6 +46,12 @@ public abstract class PaySimState extends SimState {
         this.parameters = parameters;
         BalancesClients.setRandom(super.random);
         parameters.clientsProfiles.setRandom(super.random);
+
+        // XXX Fairy builder's RandomGenerator can only use int seeds.
+        int fairySeed = Math.toIntExact(super.seed());
+        builder = Bootstrap.builder()
+                .withRandomSeed(fairySeed)
+                .withLocale(Locale.US);
     }
 
     public abstract boolean onTransactions(List<Transaction> transactions);
@@ -81,14 +91,17 @@ public abstract class PaySimState extends SimState {
         //Add the merchants
         logger.info("NbMerchants: " + (int) (parameters.nbMerchants * parameters.multiplier));
         for (int i = 0; i < parameters.nbMerchants * parameters.multiplier; i++) {
-            Merchant m = new Merchant(generateId(), this.getParameters());
+            String name = builder.build().company().getName();
+            Merchant m = new Merchant(generateUniqueMerchantId(), name, this.getParameters());
+
             merchants.add(m);
         }
 
         //Add the fraudsters
         logger.info("NbFraudsters: " + (int) (parameters.nbFraudsters * parameters.multiplier));
         for (int i = 0; i < parameters.nbFraudsters * parameters.multiplier; i++) {
-            Fraudster f = new Fraudster(generateId(), parameters);
+            String name = builder.build().person().getFullName();
+            Fraudster f = new Fraudster(generateUniqueClientId(), name, parameters);
             fraudsters.add(f);
             schedule.scheduleRepeating(f);
         }
@@ -96,7 +109,8 @@ public abstract class PaySimState extends SimState {
         //Add the banks
         logger.info("NbBanks: " + parameters.nbBanks);
         for (int i = 0; i < parameters.nbBanks; i++) {
-            Bank b = new Bank(generateId(), this.getParameters());
+            String name = String.format("Bank of %s", builder.build().person().getLastName());
+            Bank b = new Bank(generateUniqueBankId(), name, this.getParameters());
             banks.add(b);
         }
 
@@ -133,14 +147,34 @@ public abstract class PaySimState extends SimState {
         return super.random;
     }
 
-    public String generateId() {
-        final String alphabet = "0123456789";
-        final int sizeId = 10;
-        StringBuilder idBuilder = new StringBuilder(sizeId);
+    public String generateUniqueBankId() {
+        String vat = builder.build().company().getVatIdentificationNumber();
 
-        for (int i = 0; i < sizeId; i++)
-            idBuilder.append(alphabet.charAt(random.nextInt(alphabet.length())));
-        return idBuilder.toString();
+        while (!bankIds.add(vat)) {
+            vat = builder.build().company().getVatIdentificationNumber();
+        }
+        return vat;
+    }
+
+    public String generateUniqueMerchantId() {
+        String vat = builder.build().company().getVatIdentificationNumber();
+
+        while (!merchantIds.add(vat)) {
+            vat = builder.build().company().getVatIdentificationNumber();
+        }
+        return vat;
+    }
+
+    public String generateUniqueClientId() {
+        String ssn = builder.build().person().getNationalIdentityCardNumber();
+        while (!clientIds.add(ssn)) {
+            ssn = builder.build().company().getVatIdentificationNumber();
+        }
+        return ssn;
+    }
+
+    public String generateClientName() {
+        return builder.build().person().getFullName();
     }
 
     public Merchant pickRandomMerchant() {
@@ -157,7 +191,7 @@ public abstract class PaySimState extends SimState {
         String nameDest = nameOrig;
         while (nameOrig.equals(nameDest)) {
             clientDest = clients.get(random.nextInt(clients.size()));
-            nameDest = clientDest.getName();
+            nameDest = clientDest.getId();
         }
         return clientDest;
     }

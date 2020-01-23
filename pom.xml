@@ -52,6 +52,15 @@
                             <include>org.slf4j:*</include>
                             <include>org.apache.tinkerpop:*</include>
                             <include>cs.gmu.edu.eclab:*</include>
+                            <!-- JFairy Dependencies 8-( -->
+                            <include>com.devskiller:*</include>
+                            <include>org.yaml:*</include>
+                            <include>com.google.guava:*</include>
+                            <include>com.google.inject:*</include>
+                            <include>com.google.inject.extensions:*</include>
+                            <include>org.iban4j:*</include>
+                            <include>javax.inject:*</include>
+                            <include>aopalliance:*</include>
                         </includes>
                     </artifactSet>
                 </configuration>
@@ -76,6 +85,11 @@
             <groupId>org.apache.tinkerpop</groupId>
             <artifactId>tinkergraph-gremlin</artifactId>
             <version>3.3.4</version>
+        </dependency>
+        <dependency>
+            <groupId>com.devskiller</groupId>
+            <artifactId>jfairy</artifactId>
+            <version>0.6.2</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
