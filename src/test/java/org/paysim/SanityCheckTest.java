@@ -3,6 +3,8 @@ package org.paysim;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.paysim.actors.Mule;
+import org.paysim.base.Transaction;
 import org.paysim.parameters.Parameters;
 
 import java.io.BufferedReader;
@@ -11,6 +13,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
@@ -86,5 +90,35 @@ public class SanityCheckTest {
         // This order is fragile due to current hasNext() logic.
         Assertions.assertNull(sim.next());
         Assertions.assertFalse(sim.hasNext());
+    }
+
+    /**
+     * While implementing routines to generate unique client ids, it seems mules are ending
+     * up with conflicting identifiers at the moment. Brute force test for it.
+     */
+    @Test
+    void sanityCheckClientIdGeneration() {
+        PaySimState state = new PaySimState(parameters) {
+            @Override
+            public boolean onTransactions(List<Transaction> transactions) {
+                return false;
+            }
+
+            @Override
+            protected boolean onStep(long stepNum) {
+                return false;
+            }
+
+            @Override
+            public void run() {
+
+            }
+        };
+
+        for (int i=0; i<20000; i++) {
+            state.generateUniqueClientId();
+        }
+        Assertions.assertEquals(20000, state.getClientIds().size());
+
     }
 }

@@ -51,7 +51,9 @@ public abstract class PaySimState extends SimState {
         int fairySeed = Math.toIntExact(super.seed());
         builder = Bootstrap.builder()
                 .withRandomSeed(fairySeed)
-                .withLocale(Locale.US);
+                .withLocale(Locale.US)
+                .withLocale(Locale.CANADA)
+                .withLocale(Locale.UK);
     }
 
     public abstract boolean onTransactions(List<Transaction> transactions);
@@ -102,6 +104,11 @@ public abstract class PaySimState extends SimState {
         for (int i = 0; i < parameters.nbFraudsters * parameters.multiplier; i++) {
             String name = builder.build().person().getFullName();
             Fraudster f = new Fraudster(generateUniqueClientId(), name, parameters);
+
+            f.addFavoredMerchant(merchants.get(random.nextInt(parameters.nbMerchants)));
+            f.addFavoredMerchant(merchants.get(random.nextInt(parameters.nbMerchants)));
+            f.addFavoredMerchant(merchants.get(random.nextInt(parameters.nbMerchants)));
+
             fraudsters.add(f);
             schedule.scheduleRepeating(f);
         }
@@ -168,7 +175,7 @@ public abstract class PaySimState extends SimState {
     public String generateUniqueClientId() {
         String ssn = builder.build().person().getNationalIdentityCardNumber();
         while (!clientIds.add(ssn)) {
-            ssn = builder.build().company().getVatIdentificationNumber();
+            ssn = builder.build().person().getNationalIdentityCardNumber();
         }
         return ssn;
     }
@@ -185,11 +192,11 @@ public abstract class PaySimState extends SimState {
         return banks.get(random.nextInt(banks.size()));
     }
 
-    public Client pickRandomClient(String nameOrig) {
+    public Client pickRandomClient(String originatingId) {
         Client clientDest = null;
 
-        String nameDest = nameOrig;
-        while (nameOrig.equals(nameDest)) {
+        String nameDest = originatingId;
+        while (originatingId.equals(nameDest)) {
             clientDest = clients.get(random.nextInt(clients.size()));
             nameDest = clientDest.getId();
         }
@@ -212,6 +219,10 @@ public abstract class PaySimState extends SimState {
 
     public List<Client> getClients() {
         return clients;
+    }
+
+    public Set<String> getClientIds() {
+        return clientIds;
     }
 
     public void addClient(Client c) {

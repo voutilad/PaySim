@@ -8,14 +8,42 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Fraudster extends SuperActor implements Steppable {
     private static final String FRAUDSTER_IDENTIFIER = "C";
     private double profit = 0;
-    private int nbVictims = 0;
+    private final List<SuperActor> victims;
+    private final List<Merchant> favoredMerchants;
 
     public Fraudster(String id, String name, Parameters parameters) {
         super(FRAUDSTER_IDENTIFIER + id, name, parameters);
+        victims = new ArrayList<>();
+        favoredMerchants = new ArrayList<>();
+    }
+
+    public boolean addFavoredMerchant(Merchant m) {
+        return favoredMerchants.add(m);
+    }
+
+    protected Client pickTargetClient(PaySimState state) {
+        // First we try to identify a client via a Merchant we know about, 80% of the time
+        if (favoredMerchants.size() > 0 && state.getRNG().nextBoolean(0.8)) {
+            Merchant m = favoredMerchants.get(state.getRNG().nextInt(favoredMerchants.size()));
+            if (m.getRecentClients().size() > 1) {
+                Client c = m.getRecentClients().get(state.getRNG().nextInt(m.getRecentClients().size()));
+                if (c.getId() != this.getId()) {
+                    // XXX: In practice this may not happen since we currently don't let Fraudsters perform
+                    // transactions with anyone directly, but just to be safe.
+                    return c;
+                }
+            }
+        }
+
+        // Otherwise, we pick at random.
+        return state.pickRandomClient(getId());
     }
 
     @Override
@@ -29,8 +57,8 @@ public class Fraudster extends SuperActor implements Steppable {
         PaySimState paysim = (PaySimState) state;
         int step = (int) state.schedule.getSteps();
 
-        if (paysim.random.nextDouble() < parameters.fraudProbability) {
-            Client c = paysim.pickRandomClient(getId());
+        if (paysim.getRNG().nextDouble() < parameters.fraudProbability) {
+            Client c = pickTargetClient(paysim);
             c.setFraud(true);
             double balance = c.getBalance();
             // create mule client
@@ -38,7 +66,6 @@ public class Fraudster extends SuperActor implements Steppable {
                 int nbTransactions = (int) Math.ceil(balance / parameters.transferLimit);
                 for (int i = 0; i < nbTransactions; i++) {
                     boolean transferFailed;
-                    // TODO: resolve name of mule here?
                     Mule muleClient = new Mule(paysim.generateUniqueClientId(), paysim.generateClientName(), paysim.pickRandomBank(), parameters);
                     muleClient.setFraud(true);
                     if (balance > parameters.transferLimit) {
@@ -55,13 +82,13 @@ public class Fraudster extends SuperActor implements Steppable {
 
                     profit += muleClient.getBalance();
                     transactions.add(muleClient.fraudulentCashOut(paysim, step, muleClient.getBalance()));
-                    nbVictims++;
                     paysim.addClient(muleClient);
                     if (transferFailed)
                         break;
                 }
             }
             c.setFraud(false);
+            victims.add(c);
             paysim.onTransactions(transactions);
         }
     }
@@ -69,9 +96,12 @@ public class Fraudster extends SuperActor implements Steppable {
     @Override
     public String toString() {
         ArrayList<String> properties = new ArrayList<>();
+        final Set<String> uniqueVictims = new HashSet<>();
+        victims.forEach(v -> uniqueVictims.add(v.getId()));
 
         properties.add(getId());
-        properties.add(Integer.toString(nbVictims));
+        properties.add(Integer.toString(uniqueVictims.size()));
+        properties.add(String.format("[%s]", String.join(",", uniqueVictims.toArray(new String[uniqueVictims.size()]))));
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, profit));
 
         return String.join(Output.OUTPUT_SEPARATOR, properties);

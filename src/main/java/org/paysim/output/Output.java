@@ -66,7 +66,7 @@ public class Output {
 
 
     public static void writeFraudsters(List<Fraudster> fraudsters) {
-        String fraudsterHeader = "name,nbVictims,profit";
+        String fraudsterHeader = "name,nbVictims,uniqueVictims,profit";
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filenameFraudsters));
             writer.write(fraudsterHeader);

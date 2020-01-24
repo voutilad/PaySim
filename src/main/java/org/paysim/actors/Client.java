@@ -227,6 +227,7 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
+        merchantTo.rememberClient(this);
         return new Transaction(step, CASH_IN, amount, this, oldBalanceOrig,
                 newBalanceOrig, merchantTo, oldBalanceDest, newBalanceDest);
     }
@@ -241,6 +242,7 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
+        merchantTo.rememberClient(this);
         Transaction t = new Transaction(step, CASH_OUT, amount, this, oldBalanceOrig,
                 newBalanceOrig, merchantTo, oldBalanceDest, newBalanceDest);
 
@@ -258,6 +260,7 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = this.bank.getBalance();
 
+        this.bank.rememberClient(this);
         Transaction t = new Transaction(step, DEBIT, amount, this, oldBalanceOrig,
                 newBalanceOrig, this.bank, oldBalanceDest, newBalanceDest);
 
@@ -279,6 +282,7 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
+        merchantTo.rememberClient(this);
         Transaction t = new Transaction(step, PAYMENT, amount, this, oldBalanceOrig,
                 newBalanceOrig, merchantTo, oldBalanceDest, newBalanceDest);
 
@@ -289,6 +293,8 @@ public class Client extends SuperActor implements Steppable {
     protected Transaction handleTransfer(PaySimState state, int step, double amount, Client clientTo) {
         double oldBalanceOrig = this.getBalance();
         double oldBalanceDest = clientTo.getBalance();
+
+        clientTo.rememberClient(this);
 
         if (!isDetectedAsFraud(amount)) {
             boolean isUnauthorizedOverdraft = this.withdraw(amount);
@@ -331,6 +337,7 @@ public class Client extends SuperActor implements Steppable {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = this.bank.getBalance();
 
+        this.bank.rememberClient(this);
         return new Transaction(step, DEPOSIT, amount, this, oldBalanceOrig,
                 newBalanceOrig, this.bank, oldBalanceDest, newBalanceDest);
     }

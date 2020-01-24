@@ -4,7 +4,6 @@ import org.paysim.base.Transaction;
 import org.paysim.parameters.Parameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.spi.LoggerFactoryBinder;
 
 import java.util.Iterator;
 import java.util.List;

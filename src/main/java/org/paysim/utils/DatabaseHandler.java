@@ -33,10 +33,10 @@ public class DatabaseHandler {
             st.setString(1, simulatorName);
             st.setString(2, trans.getAction());
             st.setDouble(3, trans.getAmount());
-            st.setString(4, trans.getNameOrig());
+            st.setString(4, trans.getIdOrig());
             st.setDouble(5, trans.getOldBalanceOrig());
             st.setDouble(6, trans.getNewBalanceOrig());
-            st.setString(7, trans.getNameDest());
+            st.setString(7, trans.getIdDest());
             st.setDouble(8, trans.getOldBalanceDest());
             st.setDouble(9, trans.getNewBalanceDest());
             st.setBoolean(10, trans.isFraud());

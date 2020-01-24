@@ -13,10 +13,12 @@ public class Transaction implements Serializable {
     private final String action;
     private final double amount;
 
+    private final String idOrig;
     private final String nameOrig;
     private final SuperActor.Type typeOrig;
     private final double oldBalanceOrig, newBalanceOrig;
 
+    private final String idDest;
     private final String nameDest;
     private final SuperActor.Type typeDest;
     private final double oldBalanceDest, newBalanceDest;
@@ -47,11 +49,15 @@ public class Transaction implements Serializable {
         this.step = step;
         this.action = action;
         this.amount = amount;
-        this.nameOrig = originator.getId();
+
+        this.idOrig = originator.getId();
+        this.nameOrig = originator.getName();
         this.typeOrig = originator.getType();
         this.oldBalanceOrig = oldBalanceOrig;
         this.newBalanceOrig = newBalanceOrig;
-        this.nameDest = destination.getId();
+
+        this.idDest = destination.getId();
+        this.nameDest = destination.getName();
         this.typeDest = destination.getType();
         this.oldBalanceDest = oldBalanceDest;
         this.newBalanceDest = newBalanceDest;
@@ -101,6 +107,10 @@ public class Transaction implements Serializable {
         return amount;
     }
 
+    public String getIdOrig() {
+        return idOrig;
+    }
+
     public String getNameOrig() {
         return nameOrig;
     }
@@ -111,6 +121,10 @@ public class Transaction implements Serializable {
 
     public double getNewBalanceOrig() {
         return newBalanceOrig;
+    }
+
+    public String getIdDest() {
+        return idDest;
     }
 
     public String getNameDest() {
@@ -148,10 +162,10 @@ public class Transaction implements Serializable {
         properties.add(String.valueOf(step));
         properties.add(action);
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, amount));
-        properties.add(nameOrig);
+        properties.add(idOrig);
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, oldBalanceOrig));
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, newBalanceOrig));
-        properties.add(nameDest);
+        properties.add(idDest);
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, oldBalanceDest));
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, newBalanceDest));
         properties.add(Output.formatBoolean(isFraud));

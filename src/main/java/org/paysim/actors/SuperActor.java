@@ -1,8 +1,14 @@
 package org.paysim.actors;
 
 import org.paysim.parameters.Parameters;
+import org.paysim.utils.BoundedArrayDeque;
+
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
 
 public abstract class SuperActor {
+    protected static Deque<Client> prevInteractions;
     protected final Parameters parameters;
     private final String id;
     private String name;
@@ -22,6 +28,7 @@ public abstract class SuperActor {
         this.id = id;
         this.name = name;
         this.parameters = parameters;
+        prevInteractions = new BoundedArrayDeque<>(100);
     }
 
     void deposit(double amount) {
@@ -58,6 +65,14 @@ public abstract class SuperActor {
 
     public String getName() {
         return name;
+    }
+
+    public void rememberClient(Client client) {
+        prevInteractions.push(client);
+    }
+
+    public List<Client> getRecentClients() {
+        return Arrays.asList(prevInteractions.toArray(new Client[prevInteractions.size()]));
     }
 
     public abstract Type getType();
