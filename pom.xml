@@ -75,9 +75,15 @@
             </plugin>
         </plugins>
     </build>
+    <repositories>
+        <repository>
+            <id>jitpack.io</id>
+            <url>https://jitpack.io</url>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
-            <groupId>cs.gmu.edu.eclab</groupId>
+            <groupId>com.github.voutilad</groupId>
             <artifactId>mason</artifactId>
             <version>20-voutilad-1</version>
         </dependency>
