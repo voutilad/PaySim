@@ -3,9 +3,7 @@ package org.paysim.actors;
 import org.paysim.parameters.Parameters;
 import org.paysim.utils.BoundedArrayDeque;
 
-import java.util.Arrays;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 public abstract class SuperActor {
     protected static Deque<Client> prevInteractions;
@@ -15,6 +13,7 @@ public abstract class SuperActor {
     private boolean isFraud = false;
     double balance = 0;
     double overdraftLimit;
+    private Map<String, String> properties;
 
     public enum Type {
         BANK,
@@ -28,6 +27,7 @@ public abstract class SuperActor {
         this.id = id;
         this.name = name;
         this.parameters = parameters;
+        this.properties = new HashMap<>();
         prevInteractions = new BoundedArrayDeque<>(100);
     }
 
@@ -76,6 +76,18 @@ public abstract class SuperActor {
     }
 
     public abstract Type getType();
+
+    public Map<String, String> getProperties() {
+        return properties;
+    }
+
+    public String getProperty(String key) {
+        return properties.get(key);
+    }
+
+    public String setProperty(String key, String value) {
+        return properties.put(key, value);
+    }
 
     @Override
     public String toString() {

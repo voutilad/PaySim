@@ -37,14 +37,18 @@ public class Client extends SuperActor implements Steppable {
         this.bank = bank;
     }
 
-    public Client(PaySimState paySim) {
-        super(CLIENT_IDENTIFIER + paySim.generateUniqueClientId(), paySim.generateClientName(), paySim.getParameters());
-        this.bank = paySim.pickRandomBank();
-        this.clientProfile = new ClientProfile(paySim.pickNextClientProfile(), paySim.getRNG());
-        this.clientWeight = ((double) clientProfile.getClientTargetCount()) /  paySim.getParameters().stepsProfiles.getTotalTargetCount();
-        this.initialBalance = BalancesClients.pickNextBalance(paySim.getRNG());
+    public Client(PaySimState state) {
+        super(CLIENT_IDENTIFIER + state.generateUniqueClientId(), state.generateClientName(), state.getParameters());
+        this.bank = state.pickRandomBank();
+        this.clientProfile = new ClientProfile(state.pickNextClientProfile(), state.getRNG());
+        this.clientWeight = ((double) clientProfile.getClientTargetCount()) /  state.getParameters().stepsProfiles.getTotalTargetCount();
+        this.initialBalance = BalancesClients.pickNextBalance(state.getRNG());
         this.balance = initialBalance;
-        this.overdraftLimit = pickOverdraftLimit(paySim.getRNG());
+        this.overdraftLimit = pickOverdraftLimit(state.getRNG());
+
+        // TODO: Email needs us to use some state from the generator to make good looking emails matching names
+        // this.setProperty(Properties.EMAIL, state.generateEmail());
+        this.setProperty(Properties.PHONE, state.generatePhone());
     }
 
     @Override

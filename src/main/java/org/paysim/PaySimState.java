@@ -91,7 +91,8 @@ public abstract class PaySimState extends SimState {
         logger.info("Init - Seed " + seed());
 
         //Add the merchants
-        logger.info("NbMerchants: " + (int) (parameters.nbMerchants * parameters.multiplier));
+        final int numMerchants = (int) (parameters.nbMerchants * parameters.multiplier);
+        logger.info("NbMerchants: " + numMerchants);
         for (int i = 0; i < parameters.nbMerchants * parameters.multiplier; i++) {
             String name = builder.build().company().getName();
             Merchant m = new Merchant(generateUniqueMerchantId(), name, this.getParameters());
@@ -99,15 +100,24 @@ public abstract class PaySimState extends SimState {
             merchants.add(m);
         }
 
+        // We take a sample of the merchant population and set some as "high risk" (~2.8% arbitrarily)
+        List<Merchant> highRiskMerchants = new ArrayList<>();
+        for (int i = 0; i < numMerchants / 36; i++) {
+            highRiskMerchants.add(merchants.get(random.nextInt(numMerchants)));
+        }
+
         //Add the fraudsters
-        logger.info("NbFraudsters: " + (int) (parameters.nbFraudsters * parameters.multiplier));
-        for (int i = 0; i < parameters.nbFraudsters * parameters.multiplier; i++) {
+        final int numFraudsters = (int) (parameters.nbFraudsters * parameters.multiplier);
+        logger.info("NbFraudsters: " + numFraudsters);
+        for (int i = 0; i < numFraudsters; i++) {
             String name = builder.build().person().getFullName();
             Fraudster f = new Fraudster(generateUniqueClientId(), name, parameters);
 
-            f.addFavoredMerchant(merchants.get(random.nextInt(parameters.nbMerchants)));
-            f.addFavoredMerchant(merchants.get(random.nextInt(parameters.nbMerchants)));
-            f.addFavoredMerchant(merchants.get(random.nextInt(parameters.nbMerchants)));
+            // Fraudsters select some "favorites" of the high-risk merchants. A Fraudster will have some
+            // probability of targeting clients that used these merchants. The remaining events are random
+            // client targets from the universe
+            f.addFavoredMerchant(highRiskMerchants.get(random.nextInt(highRiskMerchants.size())));
+            f.addFavoredMerchant(highRiskMerchants.get(random.nextInt(highRiskMerchants.size())));
 
             fraudsters.add(f);
             schedule.scheduleRepeating(f);
@@ -122,8 +132,9 @@ public abstract class PaySimState extends SimState {
         }
 
         //Add the clients
-        logger.info("NbClients: " + (int) (parameters.nbClients * parameters.multiplier));
-        for (int i = 0; i < parameters.nbClients * parameters.multiplier; i++) {
+        final int numClients = (int) (parameters.nbClients * parameters.multiplier);
+        logger.info("NbClients: " + numClients);
+        for (int i = 0; i < numClients; i++) {
             Client c = new Client(this);
             clients.add(c);
         }
@@ -178,6 +189,14 @@ public abstract class PaySimState extends SimState {
             ssn = builder.build().person().getNationalIdentityCardNumber();
         }
         return ssn;
+    }
+
+    public String generateEmail() {
+        return builder.build().person().getEmail();
+    }
+
+    public String generatePhone() {
+        return builder.build().person().getTelephoneNumber();
     }
 
     public String generateClientName() {
