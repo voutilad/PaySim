@@ -1,7 +1,8 @@
 ![](https://github.com/voutilad/paysim/workflows/Java%20CI/badge.svg)
 
-This is a fork of PaySim designed for embedding. Key changes from the original include:
+This is a fork of PaySim designed for use as a library. 
 
+Key changes from the original include:
 - `Parameters` used statics for simulation params preventing concurrent usage and easy testing, so remove reliance on statics.
 - Relying on deducing the type of the actor based on their name prefix was annoying, so explicitly track a `SuperActor.Type` making it easier to know without string nonsense
 - PaySim was originally implemented as a single class relying on file IO, so abstract out the common parts (`PaySimState`) allowing for creation of an implementation that doesn't require writing simulation results to the file system
