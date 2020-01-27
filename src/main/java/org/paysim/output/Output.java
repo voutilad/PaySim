@@ -1,7 +1,8 @@
 package org.paysim.output;
 
 import org.paysim.PaySim;
-import org.paysim.actors.Fraudster;
+import org.paysim.actors.SuperActor;
+import org.paysim.actors.ThirdPartyFraudster;
 import org.paysim.base.ClientActionProfile;
 import org.paysim.base.StepActionProfile;
 import org.paysim.base.Transaction;
@@ -65,13 +66,13 @@ public class Output {
     }
 
 
-    public static void writeFraudsters(List<Fraudster> fraudsters) {
-        String fraudsterHeader = "name,nbVictims,uniqueVictims,profit";
+    public static void writeFraudsters(List<SuperActor> fraudsters) {
+        String fraudsterHeader = "name,type,nbVictims,victims,profit";
         try {
             BufferedWriter writer = new BufferedWriter(new FileWriter(filenameFraudsters));
             writer.write(fraudsterHeader);
             writer.newLine();
-            for (Fraudster f : fraudsters) {
+            for (SuperActor f : fraudsters) {
                 writer.write(f.toString());
                 writer.newLine();
             }

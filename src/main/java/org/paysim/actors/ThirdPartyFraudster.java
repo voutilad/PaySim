@@ -12,14 +12,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class Fraudster extends SuperActor implements Steppable {
-    private static final String FRAUDSTER_IDENTIFIER = "C";
+public class ThirdPartyFraudster extends SuperActor implements Steppable {
+    private static final String FRAUDSTER_IDENTIFIER = "F3";
     private double profit = 0;
     private final List<SuperActor> victims;
     private final List<Merchant> favoredMerchants;
 
-    public Fraudster(String id, String name, Parameters parameters) {
-        super(FRAUDSTER_IDENTIFIER + id, name, parameters);
+    public ThirdPartyFraudster(String id, String name, Parameters parameters) {
+        super(FRAUDSTER_IDENTIFIER + "-" + id, name, parameters);
         victims = new ArrayList<>();
         favoredMerchants = new ArrayList<>();
     }
@@ -29,8 +29,8 @@ public class Fraudster extends SuperActor implements Steppable {
     }
 
     protected Client pickTargetClient(PaySimState state) {
-        // First we try to identify a client via a Merchant we know about, 80% of the time
-        if (favoredMerchants.size() > 0 && state.getRNG().nextBoolean(0.8)) {
+        // First we try to identify a client via a Merchant we know about, 95% of the time
+        if (favoredMerchants.size() > 0 && state.getRNG().nextBoolean(0.95)) {
             Merchant m = favoredMerchants.get(state.getRNG().nextInt(favoredMerchants.size()));
             if (m.getRecentClients().size() > 1) {
                 Client c = m.getRecentClients().get(state.getRNG().nextInt(m.getRecentClients().size()));
@@ -48,7 +48,7 @@ public class Fraudster extends SuperActor implements Steppable {
 
     @Override
     public Type getType() {
-        return Type.FRAUDSTER;
+        return Type.THIRD_PARTY_FRAUDSTER;
     }
 
     @Override
@@ -60,6 +60,11 @@ public class Fraudster extends SuperActor implements Steppable {
         if (paysim.getRNG().nextDouble() < parameters.fraudProbability) {
             Client c = pickTargetClient(paysim);
             c.setFraud(true);
+
+            // XXX: historical logging for helping us understand PaySim a bit more
+            c.setProperty(Properties.HISTORY,
+                    c.getOrDefault(Properties.HISTORY, "") + this.getId() + ";");
+
             double balance = c.getBalance();
             // create mule client
             if (balance > 0) {
@@ -82,6 +87,8 @@ public class Fraudster extends SuperActor implements Steppable {
 
                     profit += muleClient.getBalance();
                     transactions.add(muleClient.fraudulentCashOut(paysim, step, muleClient.getBalance()));
+
+                    // TODO: should the mule be added to the universe?
                     paysim.addClient(muleClient);
                     if (transferFailed)
                         break;
@@ -100,6 +107,7 @@ public class Fraudster extends SuperActor implements Steppable {
         victims.forEach(v -> uniqueVictims.add(v.getId()));
 
         properties.add(getId());
+        properties.add(getType().toString());
         properties.add(Integer.toString(uniqueVictims.size()));
         properties.add(String.format("[%s]", String.join(",", uniqueVictims.toArray(new String[uniqueVictims.size()]))));
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, profit));

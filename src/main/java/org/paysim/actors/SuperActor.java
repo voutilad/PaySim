@@ -18,7 +18,8 @@ public abstract class SuperActor {
     public enum Type {
         BANK,
         CLIENT,
-        FRAUDSTER,
+        FIRST_PARTY_FRAUDSTER,
+        THIRD_PARTY_FRAUDSTER,
         MERCHANT,
         MULE
     }
@@ -83,6 +84,10 @@ public abstract class SuperActor {
 
     public String getProperty(String key) {
         return properties.get(key);
+    }
+
+    public String getOrDefault(String key, String defaultValue) {
+        return properties.getOrDefault(key, defaultValue);
     }
 
     public String setProperty(String key, String value) {

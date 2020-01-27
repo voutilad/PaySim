@@ -110,8 +110,9 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
 
         while (hasNext() && tx == null) {
             try {
-                tx = queue.poll(500, TimeUnit.MILLISECONDS);
+                tx = queue.poll(25, TimeUnit.MILLISECONDS);
                 if (tx != null) {
+                    // XXX: in the future, maybe we push the global step counter into the base class
                     tx.setGlobalStep(stepCounter.incrementAndGet());
                 }
             } catch (InterruptedException e) {
@@ -146,13 +147,13 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     @Override
     public boolean onTransactions(List<Transaction> transactions) {
         if (running.get()) {
-            transactions.forEach(tx -> {
+            for (Transaction tx : transactions) {
                 try {
                     this.queue.put(tx);
                 } catch (InterruptedException e) {
                     logger.error("interrupted while adding tx to queue, skipping.", e);
                 }
-            });
+            }
             return true;
         }
         return false;
@@ -170,6 +171,7 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
         }
 
         // XXX: a sloppy drain implementation...bad idea?
+        // XXX2: yes, bad idea...there's no way to close this queue implementation!
         queue.clear();
     }
 

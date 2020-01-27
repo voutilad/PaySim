@@ -1,19 +1,15 @@
 package org.paysim;
 
 import com.devskiller.jfairy.Bootstrap;
+import com.devskiller.jfairy.Fairy;
 import ec.util.MersenneTwisterFast;
-import org.paysim.actors.Bank;
-import org.paysim.actors.Client;
-import org.paysim.actors.Fraudster;
-import org.paysim.actors.Merchant;
-import org.paysim.actors.networkdrugs.NetworkDrug;
+import org.paysim.actors.*;
 import org.paysim.base.ClientActionProfile;
 import org.paysim.base.StepActionProfile;
 import org.paysim.base.Transaction;
 import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.BalancesClients;
 import org.paysim.parameters.Parameters;
-import org.paysim.parameters.TypologiesFiles;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sim.engine.SimState;
@@ -28,7 +24,7 @@ public abstract class PaySimState extends SimState {
 
     protected List<Client> clients = new ArrayList<>();
     protected List<Merchant> merchants = new ArrayList<>();
-    protected List<Fraudster> fraudsters = new ArrayList<>();
+    protected List<SuperActor> fraudsters = new ArrayList<>();
     protected List<Bank> banks = new ArrayList<>();
 
     protected Set<String> bankIds = new HashSet<>();
@@ -93,32 +89,40 @@ public abstract class PaySimState extends SimState {
         //Add the merchants
         final int numMerchants = (int) (parameters.nbMerchants * parameters.multiplier);
         logger.info("NbMerchants: " + numMerchants);
-        for (int i = 0; i < parameters.nbMerchants * parameters.multiplier; i++) {
+        for (int i = 0; i < numMerchants; i++) {
             String name = builder.build().company().getName();
-            Merchant m = new Merchant(generateUniqueMerchantId(), name, this.getParameters());
-
-            merchants.add(m);
+            merchants.add(new Merchant(generateUniqueMerchantId(), name, this.getParameters()));
         }
 
-        // We take a sample of the merchant population and set some as "high risk" (~2.8% arbitrarily)
+        // We take a sample of the merchant population and set some as "high risk" (2% arbitrarily)
         List<Merchant> highRiskMerchants = new ArrayList<>();
-        for (int i = 0; i < numMerchants / 36; i++) {
+        for (int i = 0; i < numMerchants / 50; i++) {
             highRiskMerchants.add(merchants.get(random.nextInt(numMerchants)));
         }
 
-        //Add the fraudsters
+        // Fraudsters...
         final int numFraudsters = (int) (parameters.nbFraudsters * parameters.multiplier);
         logger.info("NbFraudsters: " + numFraudsters);
-        for (int i = 0; i < numFraudsters; i++) {
-            String name = builder.build().person().getFullName();
-            Fraudster f = new Fraudster(generateUniqueClientId(), name, parameters);
 
-            // Fraudsters select some "favorites" of the high-risk merchants. A Fraudster will have some
-            // probability of targeting clients that used these merchants. The remaining events are random
+        //Add the 3rd Party fraudsters
+        final int num3rdPartyFraudsters = numFraudsters / 2;
+        for (int i = 0; i < num3rdPartyFraudsters; i++) {
+            String name = builder.build().person().getFullName();
+            ThirdPartyFraudster f = new ThirdPartyFraudster(generateUniqueClientId(), name, parameters);
+
+            // 3rd Party Fraudsters select some "favorites" of the high-risk merchants. A Fraudster will have
+            // som probability of targeting clients that used these merchants. The remaining events are random
             // client targets from the universe
             f.addFavoredMerchant(highRiskMerchants.get(random.nextInt(highRiskMerchants.size())));
             f.addFavoredMerchant(highRiskMerchants.get(random.nextInt(highRiskMerchants.size())));
 
+            fraudsters.add(f);
+            schedule.scheduleRepeating(f);
+        }
+
+        //Add the 1st Party fraudsters
+        for (int i = 0; i < numFraudsters - num3rdPartyFraudsters; i++) {
+            FirstPartyFraudster f = new FirstPartyFraudster(this, random.nextInt(6));
             fraudsters.add(f);
             schedule.scheduleRepeating(f);
         }
@@ -139,7 +143,8 @@ public abstract class PaySimState extends SimState {
             clients.add(c);
         }
 
-        NetworkDrug.createNetwork(this, parameters.typologiesFolder + TypologiesFiles.drugNetworkOne);
+        // XXX: Disable drug network for now
+        //NetworkDrug.createNetwork(this, parameters.typologiesFolder + TypologiesFiles.drugNetworkOne);
 
         // Do not write code under this part otherwise clients will not be used in simulation
         // Schedule clients to act at each step of the simulation
@@ -165,6 +170,16 @@ public abstract class PaySimState extends SimState {
         return super.random;
     }
 
+    public String generateId() {
+        final String alphabet = "0123456789";
+        final int sizeId = 10;
+        StringBuilder idBuilder = new StringBuilder(sizeId);
+
+        for (int i = 0; i < sizeId; i++)
+            idBuilder.append(alphabet.charAt(random.nextInt(alphabet.length())));
+        return idBuilder.toString();
+    }
+
     public String generateUniqueBankId() {
         String vat = builder.build().company().getVatIdentificationNumber();
 
@@ -184,11 +199,15 @@ public abstract class PaySimState extends SimState {
     }
 
     public String generateUniqueClientId() {
-        String ssn = builder.build().person().getNationalIdentityCardNumber();
-        while (!clientIds.add(ssn)) {
-            ssn = builder.build().person().getNationalIdentityCardNumber();
+        String id = generateId();
+        while (!clientIds.add(id)) {
+            id = generateId();
         }
-        return ssn;
+        return id;
+    }
+
+    public Fairy generateIdentity() {
+        return builder.build();
     }
 
     public String generateEmail() {
