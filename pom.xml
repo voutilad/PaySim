@@ -52,6 +52,8 @@
                             <include>org.slf4j:*</include>
                             <include>org.apache.tinkerpop:*</include>
                             <include>cs.gmu.edu.eclab:*</include>
+                            <include>com.github.voutilad:*</include>
+                            <include>com.github.voutilad.mason:*</include>
                             <!-- JFairy Dependencies 8-( -->
                             <include>com.devskiller:*</include>
                             <include>org.yaml:*</include>
