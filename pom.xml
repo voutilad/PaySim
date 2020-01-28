@@ -32,7 +32,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>org.paysim.PaySim</mainClass>
+                            <mainClass>org.paysim.OriginalPaySim</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

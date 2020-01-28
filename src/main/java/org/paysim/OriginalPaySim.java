@@ -16,7 +16,7 @@ import java.util.List;
  *
  * In general, it's logic is retained unchanged.
  */
-public class PaySim extends PaySimState {
+public class OriginalPaySim extends PaySimState {
 
     private static final String[] DEFAULT_ARGS = new String[]{"", "-file", "PaySim.properties", "1"};
 
@@ -41,12 +41,12 @@ public class PaySim extends PaySimState {
         }
         Parameters parameters = new Parameters(propertiesFile);
         for (int i = 0; i < nbTimesRepeat; i++) {
-            PaySim p = new PaySim(parameters);
+            OriginalPaySim p = new OriginalPaySim(parameters);
             p.run();
         }
     }
 
-    public PaySim(Parameters parameters) {
+    public OriginalPaySim(Parameters parameters) {
         super(parameters);
 
         DateFormat dateFormat = new SimpleDateFormat("yyyyMMddHHmmss");

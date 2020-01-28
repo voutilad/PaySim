@@ -1,8 +1,7 @@
 package org.paysim.output;
 
-import org.paysim.PaySim;
+import org.paysim.OriginalPaySim;
 import org.paysim.actors.SuperActor;
-import org.paysim.actors.ThirdPartyFraudster;
 import org.paysim.base.ClientActionProfile;
 import org.paysim.base.StepActionProfile;
 import org.paysim.base.Transaction;
@@ -116,7 +115,7 @@ public class Output {
         }
     }
 
-    public static void writeSummarySimulation(PaySim paySim) {
+    public static void writeSummarySimulation(OriginalPaySim paySim) {
         StringBuilder errorSummary = new StringBuilder();
         Parameters parameters = paySim.getParameters();
         StepsProfiles simulationStepsProfiles = new StepsProfiles(Output.filenameStepAggregate, 1 / parameters.multiplier, parameters.nbSteps);
