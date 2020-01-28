@@ -9,7 +9,7 @@ public class DrugDealer extends Client {
     private double drugMoneyInAccount;
 
     public DrugDealer(PaySimState paySim, double thresholdForCashOut) {
-        super(paySim);
+        super(paySim.generateIdentity(), paySim);
         this.thresholdForCashOut = thresholdForCashOut;
         this.drugMoneyInAccount = 0;
     }

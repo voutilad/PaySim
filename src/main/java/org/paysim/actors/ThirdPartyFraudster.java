@@ -2,6 +2,7 @@ package org.paysim.actors;
 
 import org.paysim.PaySimState;
 import org.paysim.base.Transaction;
+import org.paysim.identity.Identity;
 import org.paysim.output.Output;
 import org.paysim.parameters.Parameters;
 import sim.engine.SimState;
@@ -18,8 +19,8 @@ public class ThirdPartyFraudster extends SuperActor implements Steppable {
     private final List<SuperActor> victims;
     private final List<Merchant> favoredMerchants;
 
-    public ThirdPartyFraudster(String id, String name, Parameters parameters) {
-        super(FRAUDSTER_IDENTIFIER + "-" + id, name, parameters);
+    public ThirdPartyFraudster(String id, Identity identity, Parameters parameters) {
+        super(FRAUDSTER_IDENTIFIER + "-" + id, identity.name, parameters);
         victims = new ArrayList<>();
         favoredMerchants = new ArrayList<>();
     }
@@ -71,7 +72,11 @@ public class ThirdPartyFraudster extends SuperActor implements Steppable {
                 int nbTransactions = (int) Math.ceil(balance / parameters.transferLimit);
                 for (int i = 0; i < nbTransactions; i++) {
                     boolean transferFailed;
-                    Mule muleClient = new Mule(paysim.generateUniqueClientId(), paysim.generateClientName(), paysim.pickRandomBank(), parameters);
+                    Identity muleIdentity = ((PaySimState) state).generateIdentity();
+                    Mule muleClient = new Mule(paysim.generateUniqueClientId(),
+                            muleIdentity,
+                            paysim.pickRandomBank(),
+                            parameters);
                     muleClient.setFraud(true);
                     if (balance > parameters.transferLimit) {
                         Transaction t = c.handleTransfer(paysim, step, parameters.transferLimit, muleClient);

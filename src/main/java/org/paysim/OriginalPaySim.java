@@ -14,7 +14,8 @@ import java.util.List;
 /**
  * This is the original PaySim class from the parent project.
  *
- * In general, it's logic is retained unchanged.
+ * In general, (most of) it's logic is retained unchanged, with some minor exceptions as the underlying PaySimState
+ * class has changed.
  */
 public class OriginalPaySim extends PaySimState {
 

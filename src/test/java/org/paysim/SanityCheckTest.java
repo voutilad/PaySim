@@ -1,5 +1,8 @@
 package org.paysim;
 
+import com.devskiller.jfairy.Bootstrap;
+import com.devskiller.jfairy.Fairy;
+import com.devskiller.jfairy.producer.person.Person;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -14,6 +17,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
@@ -52,7 +56,11 @@ public class SanityCheckTest {
 
         // This should drain anything left in the queue. It's possible we ended up with another item due
         // to a TOCTOU flaw in the current version
+        // XXX: this sleep()/next() is to overcome races on Win10
+        Thread.sleep(100);
         sim.next();
+
+        Assertions.assertNull(sim.next());
         Assertions.assertFalse(sim.hasNext());
 
         // XXX: This sucks, but we need to wait some time for the sim to finish since

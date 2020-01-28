@@ -2,12 +2,13 @@ package org.paysim.actors;
 
 import org.paysim.PaySimState;
 import org.paysim.base.Transaction;
+import org.paysim.identity.Identity;
 import org.paysim.parameters.Parameters;
 
 public class Mule extends Client {
 
-    public Mule(String id, String name, Bank bank, Parameters parameters) {
-        super(id, name, bank, parameters);
+    public Mule(String id, Identity identity, Bank bank, Parameters parameters) {
+        super(id, identity, bank, parameters);
         this.overdraftLimit = 0;
     }
 

@@ -3,6 +3,7 @@ package org.paysim.actors;
 import com.devskiller.jfairy.Fairy;
 import org.paysim.PaySimState;
 import org.paysim.base.Transaction;
+import org.paysim.identity.Identity;
 import org.paysim.output.Output;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -14,12 +15,12 @@ public class FirstPartyFraudster extends SuperActor implements Steppable {
     private static final String FRAUDSTER_IDENTIFIER = "F1";
     private double profit = 0;
 
-    private final List<Fairy> identities;
+    private final List<Identity> identities;
     private final List<SuperActor> fauxAccounts;
 
-    public FirstPartyFraudster(PaySimState state, int numIdentities) {
-        super(FRAUDSTER_IDENTIFIER + "-" + state.generateUniqueClientId(),
-                state.generateClientName(),
+    public FirstPartyFraudster(Identity identity, PaySimState state, int numIdentities) {
+        super(state.generateUniqueClientId(),
+                identity.name,
                 state.getParameters());
         fauxAccounts = new ArrayList<>();
         identities = new ArrayList<>();

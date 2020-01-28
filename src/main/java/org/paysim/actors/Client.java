@@ -6,6 +6,7 @@ import org.paysim.base.ClientActionProfile;
 import org.paysim.base.ClientProfile;
 import org.paysim.base.StepActionProfile;
 import org.paysim.base.Transaction;
+import org.paysim.identity.Identity;
 import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.BalancesClients;
 import org.paysim.parameters.Parameters;
@@ -31,14 +32,18 @@ public class Client extends SuperActor implements Steppable {
     private int countTransferTransactions = 0;
     private double expectedAvgTransaction = 0;
     private double initialBalance;
+    private Identity identity;
 
-    Client(String id, String name, Bank bank, Parameters parameters) {
-        super(CLIENT_IDENTIFIER + id, name, parameters);
+    Client(String id, Identity identity, Bank bank, Parameters parameters) {
+        super(id, identity.name, parameters);
         this.bank = bank;
     }
 
-    public Client(PaySimState state) {
-        super(CLIENT_IDENTIFIER + state.generateUniqueClientId(), state.generateClientName(), state.getParameters());
+    // TODO: This constructor sucks...makes no sense.
+    public Client(Identity identity, PaySimState state) {
+        super(state.generateUniqueClientId(), identity.name, state.getParameters());
+        this.identity = identity;
+
         this.bank = state.pickRandomBank();
         this.clientProfile = new ClientProfile(state.pickNextClientProfile(), state.getRNG());
         this.clientWeight = ((double) clientProfile.getClientTargetCount()) /  state.getParameters().stepsProfiles.getTotalTargetCount();
@@ -48,7 +53,7 @@ public class Client extends SuperActor implements Steppable {
 
         // TODO: Email needs us to use some state from the generator to make good looking emails matching names
         // this.setProperty(Properties.EMAIL, state.generateEmail());
-        this.setProperty(Properties.PHONE, state.generatePhone());
+        this.setProperty(Properties.PHONE, identity.phoneNumber);
     }
 
     @Override

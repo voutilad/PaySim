@@ -7,6 +7,8 @@ import org.paysim.actors.*;
 import org.paysim.base.ClientActionProfile;
 import org.paysim.base.StepActionProfile;
 import org.paysim.base.Transaction;
+import org.paysim.identity.Identity;
+import org.paysim.identity.IdentityFactory;
 import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.BalancesClients;
 import org.paysim.parameters.Parameters;
@@ -33,7 +35,7 @@ public abstract class PaySimState extends SimState {
 
     protected Map<ClientActionProfile, Integer> countProfileAssignment = new HashMap<>();
 
-    protected Bootstrap.Builder builder;
+    protected IdentityFactory idFactory;
 
     long currentStep = 0;
 
@@ -45,11 +47,7 @@ public abstract class PaySimState extends SimState {
 
         // XXX Fairy builder's RandomGenerator can only use int seeds.
         int fairySeed = Math.toIntExact(super.seed());
-        builder = Bootstrap.builder()
-                .withRandomSeed(fairySeed)
-                .withLocale(Locale.US)
-                .withLocale(Locale.CANADA)
-                .withLocale(Locale.UK);
+        idFactory = new IdentityFactory(fairySeed);
     }
 
     public abstract boolean onTransactions(List<Transaction> transactions);
@@ -90,8 +88,8 @@ public abstract class PaySimState extends SimState {
         final int numMerchants = (int) (parameters.nbMerchants * parameters.multiplier);
         logger.info("NbMerchants: " + numMerchants);
         for (int i = 0; i < numMerchants; i++) {
-            String name = builder.build().company().getName();
-            merchants.add(new Merchant(generateUniqueMerchantId(), name, this.getParameters()));
+            String name = idFactory.nextMerchantName();
+            merchants.add(new Merchant(generateVAT(), name, this.getParameters()));
         }
 
         // We take a sample of the merchant population and set some as "high risk" (2% arbitrarily)
@@ -107,8 +105,8 @@ public abstract class PaySimState extends SimState {
         //Add the 3rd Party fraudsters
         final int num3rdPartyFraudsters = numFraudsters / 2;
         for (int i = 0; i < num3rdPartyFraudsters; i++) {
-            String name = builder.build().person().getFullName();
-            ThirdPartyFraudster f = new ThirdPartyFraudster(generateUniqueClientId(), name, parameters);
+            Identity identity = idFactory.nextPerson();
+            ThirdPartyFraudster f = new ThirdPartyFraudster(generateUniqueClientId(), identity, parameters);
 
             // 3rd Party Fraudsters select some "favorites" of the high-risk merchants. A Fraudster will have
             // som probability of targeting clients that used these merchants. The remaining events are random
@@ -122,7 +120,7 @@ public abstract class PaySimState extends SimState {
 
         //Add the 1st Party fraudsters
         for (int i = 0; i < numFraudsters - num3rdPartyFraudsters; i++) {
-            FirstPartyFraudster f = new FirstPartyFraudster(this, random.nextInt(6));
+            FirstPartyFraudster f = new FirstPartyFraudster(this.generateIdentity(), this, random.nextInt(6));
             fraudsters.add(f);
             schedule.scheduleRepeating(f);
         }
@@ -130,8 +128,8 @@ public abstract class PaySimState extends SimState {
         //Add the banks
         logger.info("NbBanks: " + parameters.nbBanks);
         for (int i = 0; i < parameters.nbBanks; i++) {
-            String name = String.format("Bank of %s", builder.build().person().getLastName());
-            Bank b = new Bank(generateUniqueBankId(), name, this.getParameters());
+            String name = idFactory.nextMerchantName();
+            Bank b = new Bank(generateVAT(), name, this.getParameters());
             banks.add(b);
         }
 
@@ -139,7 +137,7 @@ public abstract class PaySimState extends SimState {
         final int numClients = (int) (parameters.nbClients * parameters.multiplier);
         logger.info("NbClients: " + numClients);
         for (int i = 0; i < numClients; i++) {
-            Client c = new Client(this);
+            Client c = new Client(this.generateIdentity(), this);
             clients.add(c);
         }
 
@@ -180,46 +178,25 @@ public abstract class PaySimState extends SimState {
         return idBuilder.toString();
     }
 
-    public String generateUniqueBankId() {
-        String vat = builder.build().company().getVatIdentificationNumber();
-
-        while (!bankIds.add(vat)) {
-            vat = builder.build().company().getVatIdentificationNumber();
-        }
-        return vat;
+    public Identity generateIdentity() {
+        return idFactory.nextPerson();
     }
 
-    public String generateUniqueMerchantId() {
-        String vat = builder.build().company().getVatIdentificationNumber();
+    public String generateVAT() {
+        String vat = idFactory.getNextVAT();
 
-        while (!merchantIds.add(vat)) {
-            vat = builder.build().company().getVatIdentificationNumber();
+        while (!bankIds.add(vat)) {
+            vat = idFactory.getNextVAT();
         }
         return vat;
     }
 
     public String generateUniqueClientId() {
-        String id = generateId();
-        while (!clientIds.add(id)) {
-            id = generateId();
+        String ccn = idFactory.getNextCreditCard();
+        while (!clientIds.add(ccn)) {
+            ccn = idFactory.getNextCreditCard();
         }
-        return id;
-    }
-
-    public Fairy generateIdentity() {
-        return builder.build();
-    }
-
-    public String generateEmail() {
-        return builder.build().person().getEmail();
-    }
-
-    public String generatePhone() {
-        return builder.build().person().getTelephoneNumber();
-    }
-
-    public String generateClientName() {
-        return builder.build().person().getFullName();
+        return ccn;
     }
 
     public Merchant pickRandomMerchant() {
