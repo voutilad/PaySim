@@ -89,7 +89,7 @@ public abstract class PaySimState extends SimState {
         logger.info("NbMerchants: " + numMerchants);
         for (int i = 0; i < numMerchants; i++) {
             String name = idFactory.nextMerchantName();
-            merchants.add(new Merchant(generateVAT(), name, this.getParameters()));
+            merchants.add(new Merchant(generateVAT(), name, this));
         }
 
         // We take a sample of the merchant population and set some as "high risk" (2% arbitrarily)
@@ -106,7 +106,7 @@ public abstract class PaySimState extends SimState {
         final int num3rdPartyFraudsters = numFraudsters / 2;
         for (int i = 0; i < num3rdPartyFraudsters; i++) {
             Identity identity = idFactory.nextPerson();
-            ThirdPartyFraudster f = new ThirdPartyFraudster(generateUniqueClientId(), identity, parameters);
+            ThirdPartyFraudster f = new ThirdPartyFraudster(this, idFactory.nextPerson());
 
             // 3rd Party Fraudsters select some "favorites" of the high-risk merchants. A Fraudster will have
             // som probability of targeting clients that used these merchants. The remaining events are random
@@ -120,7 +120,7 @@ public abstract class PaySimState extends SimState {
 
         //Add the 1st Party fraudsters
         for (int i = 0; i < numFraudsters - num3rdPartyFraudsters; i++) {
-            FirstPartyFraudster f = new FirstPartyFraudster(this.generateIdentity(), this, random.nextInt(6));
+            FirstPartyFraudster f = new FirstPartyFraudster(this, idFactory.nextPerson());
             fraudsters.add(f);
             schedule.scheduleRepeating(f);
         }
@@ -129,7 +129,7 @@ public abstract class PaySimState extends SimState {
         logger.info("NbBanks: " + parameters.nbBanks);
         for (int i = 0; i < parameters.nbBanks; i++) {
             String name = idFactory.nextMerchantName();
-            Bank b = new Bank(generateVAT(), name, this.getParameters());
+            Bank b = new Bank(generateVAT(), name, this);
             banks.add(b);
         }
 
@@ -137,7 +137,7 @@ public abstract class PaySimState extends SimState {
         final int numClients = (int) (parameters.nbClients * parameters.multiplier);
         logger.info("NbClients: " + numClients);
         for (int i = 0; i < numClients; i++) {
-            Client c = new Client(this.generateIdentity(), this);
+            Client c = new Client(this);
             clients.add(c);
         }
 

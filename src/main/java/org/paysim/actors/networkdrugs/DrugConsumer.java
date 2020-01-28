@@ -13,7 +13,7 @@ public class DrugConsumer extends Client {
     private double probabilityBuy;
 
     public DrugConsumer(PaySimState paySim, DrugDealer dealer, double monthlySpending, RandomCollection<Double> probAmountProfile, double meanTr) {
-        super(paySim.generateIdentity(), paySim);
+        super(paySim);
         this.dealer = dealer;
         this.probAmountProfile = probAmountProfile;
         this.probabilityBuy = monthlySpending / meanTr / paySim.getParameters().nbSteps;

@@ -25,6 +25,7 @@ public class IdentityFactory {
         Person p = builder.build().person();
         Identity id = new Identity(
                 p.getFullName(),
+                p.getEmail(),
                 p.getNationalIdentityCardNumber(),
                 p.getTelephoneNumber());
 

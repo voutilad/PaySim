@@ -19,10 +19,20 @@ public class ThirdPartyFraudster extends SuperActor implements Steppable {
     private final List<SuperActor> victims;
     private final List<Merchant> favoredMerchants;
 
-    public ThirdPartyFraudster(String id, Identity identity, Parameters parameters) {
-        super(FRAUDSTER_IDENTIFIER + "-" + id, identity.name, parameters);
+    public ThirdPartyFraudster(PaySimState state, Identity identity) {
+        this(state.generateId(), state, identity);
+    }
+
+    public ThirdPartyFraudster(String id, PaySimState state, Identity identity) {
+        super(FRAUDSTER_IDENTIFIER + "-" + id, state);
+
         victims = new ArrayList<>();
         favoredMerchants = new ArrayList<>();
+
+        // For now, we materialize the Identity into the property map
+        this.setProperty(Properties.PHONE, identity.phoneNumber);
+        this.setProperty(Properties.NAME, identity.name);
+        this.setProperty(Properties.EMAIL, identity.email);
     }
 
     public boolean addFavoredMerchant(Merchant m) {
@@ -64,7 +74,7 @@ public class ThirdPartyFraudster extends SuperActor implements Steppable {
 
             // XXX: historical logging for helping us understand PaySim a bit more
             c.setProperty(Properties.HISTORY,
-                    c.getOrDefault(Properties.HISTORY, "") + this.getId() + ";");
+                    c.getPropertyOrDefault(Properties.HISTORY, "") + this.getId() + ";");
 
             double balance = c.getBalance();
             // create mule client
@@ -72,11 +82,8 @@ public class ThirdPartyFraudster extends SuperActor implements Steppable {
                 int nbTransactions = (int) Math.ceil(balance / parameters.transferLimit);
                 for (int i = 0; i < nbTransactions; i++) {
                     boolean transferFailed;
-                    Identity muleIdentity = ((PaySimState) state).generateIdentity();
-                    Mule muleClient = new Mule(paysim.generateUniqueClientId(),
-                            muleIdentity,
-                            paysim.pickRandomBank(),
-                            parameters);
+                    Identity muleIdentity = paysim.generateIdentity();
+                    Mule muleClient = new Mule(paysim, muleIdentity);
                     muleClient.setFraud(true);
                     if (balance > parameters.transferLimit) {
                         Transaction t = c.handleTransfer(paysim, step, parameters.transferLimit, muleClient);
@@ -92,8 +99,6 @@ public class ThirdPartyFraudster extends SuperActor implements Steppable {
 
                     profit += muleClient.getBalance();
                     transactions.add(muleClient.fraudulentCashOut(paysim, step, muleClient.getBalance()));
-
-                    // TODO: should the mule be added to the universe?
                     paysim.addClient(muleClient);
                     if (transferFailed)
                         break;

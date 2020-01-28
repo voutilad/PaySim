@@ -1,18 +1,19 @@
 package org.paysim.actors;
 
+import org.paysim.PaySimState;
 import org.paysim.parameters.Parameters;
 import org.paysim.utils.BoundedArrayDeque;
 
 import java.util.*;
 
 public abstract class SuperActor {
-    protected static Deque<Client> prevInteractions;
+    protected final Deque<Client> prevInteractions;
     protected final Parameters parameters;
     private final String id;
     private boolean isFraud = false;
     double balance = 0;
     double overdraftLimit;
-    private Map<String, String> properties;
+    protected Map<String, String> properties;
 
     public enum Type {
         BANK,
@@ -23,12 +24,10 @@ public abstract class SuperActor {
         MULE
     }
 
-    SuperActor(String id, String name, Parameters parameters) {
+    SuperActor(String id, PaySimState state) {
         this.id = id;
-        this.parameters = parameters;
-
+        parameters = state.getParameters();
         properties = new HashMap<>();
-        properties.put(Properties.NAME, name);
         prevInteractions = new BoundedArrayDeque<>(100);
     }
 
@@ -86,7 +85,7 @@ public abstract class SuperActor {
         return properties.get(key);
     }
 
-    public String getOrDefault(String key, String defaultValue) {
+    public String getPropertyOrDefault(String key, String defaultValue) {
         return properties.getOrDefault(key, defaultValue);
     }
 

@@ -9,7 +9,6 @@ import org.paysim.base.Transaction;
 import org.paysim.identity.Identity;
 import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.BalancesClients;
-import org.paysim.parameters.Parameters;
 import org.paysim.utils.RandomCollection;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -26,22 +25,16 @@ public class Client extends SuperActor implements Steppable {
     protected static final String CASH_IN = "CASH_IN", CASH_OUT = "CASH_OUT", DEBIT = "DEBIT",
             PAYMENT = "PAYMENT", TRANSFER = "TRANSFER", DEPOSIT = "DEPOSIT";
     private final Bank bank;
-    private ClientProfile clientProfile;
-    private double clientWeight;
+    private final ClientProfile clientProfile;
+    private final double clientWeight;
     private double balanceMax = 0;
     private int countTransferTransactions = 0;
     private double expectedAvgTransaction = 0;
     private double initialBalance;
-    private Identity identity;
+    private final Identity identity;
 
-    Client(String id, Identity identity, Bank bank, Parameters parameters) {
-        super(id, identity.name, parameters);
-        this.bank = bank;
-    }
-
-    // TODO: This constructor sucks...makes no sense.
-    public Client(Identity identity, PaySimState state) {
-        super(state.generateUniqueClientId(), identity.name, state.getParameters());
+    Client(String id, PaySimState state, Identity identity) {
+        super(id, state);
         this.identity = identity;
 
         this.bank = state.pickRandomBank();
@@ -51,10 +44,26 @@ public class Client extends SuperActor implements Steppable {
         this.balance = initialBalance;
         this.overdraftLimit = pickOverdraftLimit(state.getRNG());
 
-        // TODO: Email needs us to use some state from the generator to make good looking emails matching names
-        // this.setProperty(Properties.EMAIL, state.generateEmail());
+        // For now, we materialize the Identity into the property map
         this.setProperty(Properties.PHONE, identity.phoneNumber);
+        this.setProperty(Properties.NAME, identity.name);
+        this.setProperty(Properties.EMAIL, identity.email);
     }
+
+    public Client(PaySimState state, Identity identity) {
+        this(state.generateUniqueClientId(), state, identity);
+    }
+
+    public Client(PaySimState state) {
+        this(state, state.generateIdentity());
+    }
+
+    public Identity getIdentity() {
+        return identity;
+    }
+
+    //-------------------------------------------------------------------------------
+    // XXX Most of the below is from the original PaySim codebase
 
     @Override
     public void step(SimState state) {

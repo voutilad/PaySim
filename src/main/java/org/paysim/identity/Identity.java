@@ -4,11 +4,13 @@ import java.util.Objects;
 
 public class Identity {
     public final String name;
+    public final String email;
     public final String ssn;
     public final String phoneNumber;
 
-    public Identity(String name, String ssn, String phoneNumber) {
+    protected Identity(String name, String email, String ssn, String phoneNumber) {
         this.name = name;
+        this.email = email;
         this.ssn = ssn;
         this.phoneNumber = phoneNumber;
     }

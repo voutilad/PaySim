@@ -1,6 +1,5 @@
 package org.paysim.actors;
 
-import com.devskiller.jfairy.Fairy;
 import org.paysim.PaySimState;
 import org.paysim.base.Transaction;
 import org.paysim.identity.Identity;
@@ -18,16 +17,28 @@ public class FirstPartyFraudster extends SuperActor implements Steppable {
     private final List<Identity> identities;
     private final List<SuperActor> fauxAccounts;
 
-    public FirstPartyFraudster(Identity identity, PaySimState state, int numIdentities) {
-        super(state.generateUniqueClientId(),
-                identity.name,
-                state.getParameters());
+    public FirstPartyFraudster(PaySimState state, Identity identity) {
+        this(state.generateId(), state, identity);
+    }
+
+    public FirstPartyFraudster(String id, PaySimState state, Identity identity) {
+        // TODO: come up with a default for num of faux identities
+        this(id, state, identity, 3);
+    }
+
+    public FirstPartyFraudster(String id, PaySimState state, Identity identity, int numIdentities) {
+        super(id, state);
         fauxAccounts = new ArrayList<>();
         identities = new ArrayList<>();
 
         for (int i=0; i<numIdentities; i++) {
             identities.add(state.generateIdentity());
         }
+
+        // For now, we materialize the Identity into the property map
+        this.setProperty(Properties.PHONE, identity.phoneNumber);
+        this.setProperty(Properties.NAME, identity.name);
+        this.setProperty(Properties.EMAIL, identity.email);
     }
 
     @Override

@@ -1,12 +1,13 @@
 package org.paysim.actors;
 
-import org.paysim.parameters.Parameters;
+import org.paysim.PaySimState;
 
 public class Merchant extends SuperActor {
     private static final String MERCHANT_IDENTIFIER = "M";
 
-    public Merchant(String id, String name, Parameters parameters) {
-        super(MERCHANT_IDENTIFIER + id, name, parameters);
+    public Merchant(String id, String name, PaySimState state) {
+        super(MERCHANT_IDENTIFIER + id, state);
+        properties.put(Properties.NAME, name);
     }
 
     @Override
