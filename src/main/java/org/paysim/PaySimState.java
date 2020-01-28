@@ -255,6 +255,18 @@ public abstract class PaySimState extends SimState {
         return parameters.stepsProfiles.getActionForStep((int) currentStep, action);
     }
 
+    public List<Merchant> getMerchants() {
+        return merchants;
+    }
+
+    public List<SuperActor> getFraudsters() {
+        return fraudsters;
+    }
+
+    public List<Bank> getBanks() {
+        return banks;
+    }
+
     public List<Client> getClients() {
         return clients;
     }

@@ -9,7 +9,6 @@ public abstract class SuperActor {
     protected static Deque<Client> prevInteractions;
     protected final Parameters parameters;
     private final String id;
-    private String name;
     private boolean isFraud = false;
     double balance = 0;
     double overdraftLimit;
@@ -26,9 +25,10 @@ public abstract class SuperActor {
 
     SuperActor(String id, String name, Parameters parameters) {
         this.id = id;
-        this.name = name;
         this.parameters = parameters;
-        this.properties = new HashMap<>();
+
+        properties = new HashMap<>();
+        properties.put(Properties.NAME, name);
         prevInteractions = new BoundedArrayDeque<>(100);
     }
 
@@ -65,7 +65,7 @@ public abstract class SuperActor {
     }
 
     public String getName() {
-        return name;
+        return properties.getOrDefault(Properties.NAME, "");
     }
 
     public void rememberClient(Client client) {

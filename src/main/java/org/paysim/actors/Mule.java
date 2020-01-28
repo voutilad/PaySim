@@ -12,8 +12,6 @@ public class Mule extends Client {
     }
 
     Transaction fraudulentCashOut(PaySimState state, int step, double amount) {
-        String action = "CASH_OUT";
-
         Merchant merchantTo = state.pickRandomMerchant();
         double oldBalanceOrig = this.getBalance();
         double oldBalanceDest = merchantTo.getBalance();
@@ -23,7 +21,7 @@ public class Mule extends Client {
         double newBalanceOrig = this.getBalance();
         double newBalanceDest = merchantTo.getBalance();
 
-        Transaction t = new Transaction(step, action, amount, this, oldBalanceOrig,
+        Transaction t = new Transaction(step, CASH_OUT, amount, this, oldBalanceOrig,
                 newBalanceOrig, merchantTo, oldBalanceDest, newBalanceDest);
         t.setFraud(this.isFraud());
         return t;

@@ -4,14 +4,11 @@ import com.devskiller.jfairy.Fairy;
 import org.paysim.PaySimState;
 import org.paysim.base.Transaction;
 import org.paysim.output.Output;
-import org.paysim.parameters.Parameters;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class FirstPartyFraudster extends SuperActor implements Steppable {
     private static final String FRAUDSTER_IDENTIFIER = "F1";

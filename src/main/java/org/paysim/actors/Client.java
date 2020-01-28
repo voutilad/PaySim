@@ -22,7 +22,7 @@ import static java.lang.Math.max;
 public class Client extends SuperActor implements Steppable {
     private static final String CLIENT_IDENTIFIER = "C";
     private static final int MIN_NB_TRANSFER_FOR_FRAUD = 3;
-    private static final String CASH_IN = "CASH_IN", CASH_OUT = "CASH_OUT", DEBIT = "DEBIT",
+    protected static final String CASH_IN = "CASH_IN", CASH_OUT = "CASH_OUT", DEBIT = "DEBIT",
             PAYMENT = "PAYMENT", TRANSFER = "TRANSFER", DEPOSIT = "DEPOSIT";
     private final Bank bank;
     private ClientProfile clientProfile;
