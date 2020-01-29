@@ -4,7 +4,9 @@ import com.devskiller.jfairy.Bootstrap;
 import com.devskiller.jfairy.producer.company.Company;
 import com.devskiller.jfairy.producer.person.Person;
 
+import java.util.HashSet;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Wraps the jFairy library and provides an identity generation function.
@@ -12,6 +14,8 @@ import java.util.Locale;
  * This keeps some of the jFairy confusion to a minimum.
  */
 public class IdentityFactory {
+    private final Set<String> ccnSet = new HashSet<>();
+
     final private Bootstrap.Builder builder;
 
     public IdentityFactory(int randomSeed) {
@@ -21,15 +25,25 @@ public class IdentityFactory {
                 .withLocale(Locale.CANADA);
     }
 
-    public Identity nextPerson() {
+    public ClientIdentity nextPerson() {
         Person p = builder.build().person();
-        Identity id = new Identity(
+
+        return new ClientIdentity(
+                getNextCreditCard(),
                 p.getFullName(),
                 p.getEmail(),
                 p.getNationalIdentityCardNumber(),
                 p.getTelephoneNumber());
+    }
 
-        return id;
+    public BankIdentity nextBank() {
+        Person p = builder.build().person();
+        return new BankIdentity(getNextVAT(), String.format("Bank of %s", p.getLastName()));
+    }
+
+    public MerchantIdentity nextMerchant() {
+        Company c = builder.build().company();
+        return new MerchantIdentity(c.getVatIdentificationNumber(), c.getName());
     }
 
     public String getNextVAT() {
@@ -38,7 +52,11 @@ public class IdentityFactory {
     }
 
     public String getNextCreditCard() {
-        return builder.build().creditCard().getCardNumber();
+        String ccn = builder.build().creditCard().getCardNumber();
+        while (!ccnSet.add(ccn)) {
+            ccn = builder.build().creditCard().getCardNumber();
+        }
+        return ccn;
     }
 
     public String nextMerchantName() {

@@ -2,6 +2,9 @@ package org.paysim.actors;
 
 import org.paysim.PaySimState;
 import org.paysim.base.Transaction;
+import org.paysim.identity.ClientIdentity;
+import org.paysim.identity.HasClientIdentity;
+import org.paysim.identity.Identifiable;
 import org.paysim.identity.Identity;
 import org.paysim.output.Output;
 import sim.engine.SimState;
@@ -9,36 +12,29 @@ import sim.engine.Steppable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-public class FirstPartyFraudster extends SuperActor implements Steppable {
-    private static final String FRAUDSTER_IDENTIFIER = "F1";
+public class FirstPartyFraudster extends SuperActor implements HasClientIdentity, Identifiable, Steppable {
     private double profit = 0;
 
-    private final List<Identity> identities;
+    private final ClientIdentity identity;
+    private final List<ClientIdentity> identities;
     private final List<SuperActor> fauxAccounts;
 
-    public FirstPartyFraudster(PaySimState state, Identity identity) {
-        this(state.generateId(), state, identity);
-    }
-
-    public FirstPartyFraudster(String id, PaySimState state, Identity identity) {
+    public FirstPartyFraudster(PaySimState state, ClientIdentity identity) {
         // TODO: come up with a default for num of faux identities
-        this(id, state, identity, 3);
+        this(state, identity, 3);
     }
 
-    public FirstPartyFraudster(String id, PaySimState state, Identity identity, int numIdentities) {
-        super(id, state);
+    public FirstPartyFraudster(PaySimState state, ClientIdentity identity, int numIdentities) {
+        super(state);
+        this.identity = identity;
         fauxAccounts = new ArrayList<>();
         identities = new ArrayList<>();
 
         for (int i=0; i<numIdentities; i++) {
             identities.add(state.generateIdentity());
         }
-
-        // For now, we materialize the Identity into the property map
-        this.setProperty(Properties.PHONE, identity.phoneNumber);
-        this.setProperty(Properties.NAME, identity.name);
-        this.setProperty(Properties.EMAIL, identity.email);
     }
 
     @Override
@@ -67,5 +63,30 @@ public class FirstPartyFraudster extends SuperActor implements Steppable {
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, profit));
 
         return String.join(Output.OUTPUT_SEPARATOR, properties);
+    }
+
+    @Override
+    public String getId() {
+        return identity.id;
+    }
+
+    @Override
+    public String getName() {
+        return identity.name;
+    }
+
+    @Override
+    public Identity getIdentity() {
+        return identity;
+    }
+
+    @Override
+    public ClientIdentity getClientIdentity() {
+        return identity;
+    }
+
+    @Override
+    public Map<String, String> getIdentityAsMap() {
+        return identity.asMap();
     }
 }

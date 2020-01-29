@@ -103,34 +103,4 @@ public class SanityCheckTest {
         Assertions.assertNull(sim.next());
         Assertions.assertFalse(sim.hasNext());
     }
-
-    /**
-     * While implementing routines to generate unique client ids, it seems mules are ending
-     * up with conflicting identifiers at the moment. Brute force test for it.
-     */
-    @Test
-    void sanityCheckClientIdGeneration() {
-        PaySimState state = new PaySimState(parameters) {
-            @Override
-            public boolean onTransactions(List<Transaction> transactions) {
-                return false;
-            }
-
-            @Override
-            protected boolean onStep(long stepNum) {
-                return false;
-            }
-
-            @Override
-            public void run() {
-
-            }
-        };
-
-        for (int i=0; i<20000; i++) {
-            state.generateUniqueClientId();
-        }
-        Assertions.assertEquals(20000, state.getClientIds().size());
-
-    }
 }

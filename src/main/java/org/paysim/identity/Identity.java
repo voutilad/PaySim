@@ -1,32 +1,26 @@
 package org.paysim.identity;
 
-import java.util.Objects;
+import java.util.Map;
 
-public class Identity {
+/**
+ * A core "identity" for an account in PaySim requiring an `id` and a `name`.
+ */
+public abstract class Identity {
+    public final String id;
     public final String name;
-    public final String email;
-    public final String ssn;
-    public final String phoneNumber;
 
-    protected Identity(String name, String email, String ssn, String phoneNumber) {
+    protected Identity(String id, String name) {
+        this.id = id;
         this.name = name;
-        this.email = email;
-        this.ssn = ssn;
-        this.phoneNumber = phoneNumber;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Identity identity = (Identity) o;
-        return Objects.equals(name, identity.name) &&
-                Objects.equals(ssn, identity.ssn) &&
-                Objects.equals(phoneNumber, identity.phoneNumber);
+    public String getId() {
+        return id;
     }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(name, ssn, phoneNumber);
+    public String getName() {
+        return name;
     }
+
+    public abstract Map<String, String> asMap();
 }

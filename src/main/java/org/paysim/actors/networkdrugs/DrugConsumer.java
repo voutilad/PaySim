@@ -29,12 +29,12 @@ public class DrugConsumer extends Client {
         if (wantsToBuyDrugs(paySim.random)) {
             double amount = pickAmount();
 
-            handleTransferDealer(paySim, step, amount);
+            handleTransferDealer(step, amount);
         }
     }
 
-    private Transaction handleTransferDealer(PaySimState paySim, int step, double amount) {
-        Transaction t = handleTransfer(paySim, step, amount, dealer);
+    private Transaction handleTransferDealer(int step, double amount) {
+        Transaction t = handleTransfer(dealer, step, amount);
 
         if (t.isSuccessful()) {
             dealer.addMoneyFromDrug(amount);

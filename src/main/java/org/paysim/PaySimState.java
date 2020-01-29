@@ -1,13 +1,11 @@
 package org.paysim;
 
-import com.devskiller.jfairy.Bootstrap;
-import com.devskiller.jfairy.Fairy;
 import ec.util.MersenneTwisterFast;
 import org.paysim.actors.*;
 import org.paysim.base.ClientActionProfile;
 import org.paysim.base.StepActionProfile;
 import org.paysim.base.Transaction;
-import org.paysim.identity.Identity;
+import org.paysim.identity.ClientIdentity;
 import org.paysim.identity.IdentityFactory;
 import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.BalancesClients;
@@ -19,7 +17,7 @@ import sim.engine.SimState;
 import java.util.*;
 
 public abstract class PaySimState extends SimState {
-    public static final double PAYSIM_VERSION = 2.0;
+    public static final double PAYSIM_VERSION = 2.1;
 
     private final Logger logger = LoggerFactory.getLogger(PaySimState.class);
     protected Parameters parameters;
@@ -28,10 +26,6 @@ public abstract class PaySimState extends SimState {
     protected List<Merchant> merchants = new ArrayList<>();
     protected List<SuperActor> fraudsters = new ArrayList<>();
     protected List<Bank> banks = new ArrayList<>();
-
-    protected Set<String> bankIds = new HashSet<>();
-    protected Set<String> merchantIds = new HashSet<>();
-    protected Set<String> clientIds = new HashSet<>();
 
     protected Map<ClientActionProfile, Integer> countProfileAssignment = new HashMap<>();
 
@@ -45,9 +39,7 @@ public abstract class PaySimState extends SimState {
         BalancesClients.setRandom(super.random);
         parameters.clientsProfiles.setRandom(super.random);
 
-        // XXX Fairy builder's RandomGenerator can only use int seeds.
-        int fairySeed = Math.toIntExact(super.seed());
-        idFactory = new IdentityFactory(fairySeed);
+        idFactory = new IdentityFactory(Math.toIntExact(super.seed()));
     }
 
     public abstract boolean onTransactions(List<Transaction> transactions);
@@ -88,8 +80,7 @@ public abstract class PaySimState extends SimState {
         final int numMerchants = (int) (parameters.nbMerchants * parameters.multiplier);
         logger.info("NbMerchants: " + numMerchants);
         for (int i = 0; i < numMerchants; i++) {
-            String name = idFactory.nextMerchantName();
-            merchants.add(new Merchant(generateVAT(), name, this));
+            merchants.add(new Merchant(this, idFactory.nextMerchant()));
         }
 
         // We take a sample of the merchant population and set some as "high risk" (2% arbitrarily)
@@ -105,7 +96,7 @@ public abstract class PaySimState extends SimState {
         //Add the 3rd Party fraudsters
         final int num3rdPartyFraudsters = numFraudsters / 2;
         for (int i = 0; i < num3rdPartyFraudsters; i++) {
-            Identity identity = idFactory.nextPerson();
+            ClientIdentity identity = idFactory.nextPerson();
             ThirdPartyFraudster f = new ThirdPartyFraudster(this, idFactory.nextPerson());
 
             // 3rd Party Fraudsters select some "favorites" of the high-risk merchants. A Fraudster will have
@@ -129,7 +120,7 @@ public abstract class PaySimState extends SimState {
         logger.info("NbBanks: " + parameters.nbBanks);
         for (int i = 0; i < parameters.nbBanks; i++) {
             String name = idFactory.nextMerchantName();
-            Bank b = new Bank(generateVAT(), name, this);
+            Bank b = new Bank(this, idFactory.nextBank());
             banks.add(b);
         }
 
@@ -178,25 +169,8 @@ public abstract class PaySimState extends SimState {
         return idBuilder.toString();
     }
 
-    public Identity generateIdentity() {
+    public ClientIdentity generateIdentity() {
         return idFactory.nextPerson();
-    }
-
-    public String generateVAT() {
-        String vat = idFactory.getNextVAT();
-
-        while (!bankIds.add(vat)) {
-            vat = idFactory.getNextVAT();
-        }
-        return vat;
-    }
-
-    public String generateUniqueClientId() {
-        String ccn = idFactory.getNextCreditCard();
-        while (!clientIds.add(ccn)) {
-            ccn = idFactory.getNextCreditCard();
-        }
-        return ccn;
     }
 
     public Merchant pickRandomMerchant() {
@@ -246,10 +220,6 @@ public abstract class PaySimState extends SimState {
 
     public List<Client> getClients() {
         return clients;
-    }
-
-    public Set<String> getClientIds() {
-        return clientIds;
     }
 
     public void addClient(Client c) {

@@ -1,19 +1,20 @@
 package org.paysim.actors;
 
 import org.paysim.PaySimState;
+import org.paysim.identity.Identifiable;
+import org.paysim.identity.Identity;
 import org.paysim.parameters.Parameters;
 import org.paysim.utils.BoundedArrayDeque;
 
 import java.util.*;
 
-public abstract class SuperActor {
+public abstract class SuperActor implements Identifiable {
     protected final Deque<Client> prevInteractions;
     protected final Parameters parameters;
-    private final String id;
+
     private boolean isFraud = false;
     double balance = 0;
     double overdraftLimit;
-    protected Map<String, String> properties;
 
     public enum Type {
         BANK,
@@ -24,10 +25,8 @@ public abstract class SuperActor {
         MULE
     }
 
-    SuperActor(String id, PaySimState state) {
-        this.id = id;
+    SuperActor(PaySimState state) {
         parameters = state.getParameters();
-        properties = new HashMap<>();
         prevInteractions = new BoundedArrayDeque<>(100);
     }
 
@@ -59,14 +58,6 @@ public abstract class SuperActor {
         return balance;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public String getName() {
-        return properties.getOrDefault(Properties.NAME, "");
-    }
-
     public void rememberClient(Client client) {
         prevInteractions.push(client);
     }
@@ -77,24 +68,8 @@ public abstract class SuperActor {
 
     public abstract Type getType();
 
-    public Map<String, String> getProperties() {
-        return properties;
-    }
-
-    public String getProperty(String key) {
-        return properties.get(key);
-    }
-
-    public String getPropertyOrDefault(String key, String defaultValue) {
-        return properties.getOrDefault(key, defaultValue);
-    }
-
-    public String setProperty(String key, String value) {
-        return properties.put(key, value);
-    }
-
     @Override
     public String toString() {
-        return String.format("%s [%s]", id, getType());
+        return String.format("%s [%s]", getId(), getType());
     }
 }
