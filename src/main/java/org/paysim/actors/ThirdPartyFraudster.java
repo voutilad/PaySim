@@ -7,8 +7,6 @@ import org.paysim.identity.HasClientIdentity;
 import org.paysim.identity.Identifiable;
 import org.paysim.identity.Identity;
 import org.paysim.output.Output;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import sim.engine.SimState;
 import sim.engine.Steppable;
 
@@ -23,16 +21,17 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
     private final Mule mule;
     private final Set<Client> victims;
     private final Set<Merchant> favoredMerchants;
-    private final Logger log = LoggerFactory.getLogger(ThirdPartyFraudster.class);
 
     private final float P_NEW_VICTIM = 0.4f;
 
     public ThirdPartyFraudster(PaySimState state, ClientIdentity identity) {
         super(state);
         this.identity = identity;
-        mule = new Mule(state, identity);
         victims = new HashSet<>();
         favoredMerchants = new HashSet<>();
+
+        mule = new Mule(state, identity);
+        state.addClient(mule);
     }
 
     /**
@@ -46,7 +45,8 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
 
     protected double pickTestChargeAmount(PaySimState state) {
         // XXX: for now let's just say it's a "small" test charge with some variability
-        return state.getParameters().transferLimit * 0.5 * (1 + (1 / state.getRNG().nextInt(50)));
+        final double wobble = 1 + (1 / (state.getRNG().nextInt(50) + 1));
+        return state.getParameters().transferLimit * 0.05 * wobble;
     }
 
     protected Merchant pickTestMerchant(PaySimState state) {
@@ -102,6 +102,7 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
         ArrayList<Transaction> transactions = new ArrayList<>();
         int step = (int) state.schedule.getSteps();
 
+        // XXX: Core 1st Party Fraud Logic
         if (paysim.getRNG().nextDouble() < parameters.fraudProbability) {
             if (victims.isEmpty() || paysim.getRNG().nextBoolean(P_NEW_VICTIM)) {
                 // Time to find a new lucky victim
@@ -131,6 +132,12 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
                     c.setFraud(false);
                 });
             }
+        }
+
+        // Right now, we need to always check our Mule accounts to see if we want to cash them out. Mules
+        // are brainless because they're unscheduled actors
+        if (paysim.getRNG().nextBoolean(0.3)) {
+            mule.fraudulentCashOut(paysim, step);
         }
         paysim.onTransactions(transactions);
     }

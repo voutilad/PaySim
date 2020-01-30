@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * Hi, I'm Finley...the First Party Fraudster!
+ */
 public class FirstPartyFraudster extends SuperActor implements HasClientIdentity, Identifiable, Steppable {
     private double profit = 0;
 
