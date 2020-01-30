@@ -17,6 +17,7 @@ import java.util.Map;
 public class FirstPartyFraudster extends SuperActor implements HasClientIdentity, Identifiable, Steppable {
     private double profit = 0;
 
+    private final Mule mule;
     private final ClientIdentity identity;
     private final List<ClientIdentity> identities;
     private final List<SuperActor> fauxAccounts;
@@ -35,6 +36,7 @@ public class FirstPartyFraudster extends SuperActor implements HasClientIdentity
         for (int i=0; i<numIdentities; i++) {
             identities.add(state.generateIdentity());
         }
+        mule = new Mule(state, this.identity);
     }
 
     @Override
@@ -44,11 +46,10 @@ public class FirstPartyFraudster extends SuperActor implements HasClientIdentity
 
     @Override
     public void step(SimState state) {
-        ArrayList<Transaction> transactions = new ArrayList<>();
         PaySimState paysim = (PaySimState) state;
 
         if (paysim.getRNG().nextDouble() < parameters.fraudProbability) {
-            // TODO: implement fraud logic...lol
+
         }
     }
 

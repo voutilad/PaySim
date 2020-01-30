@@ -76,6 +76,14 @@ public abstract class PaySimState extends SimState {
     private void initActors() {
         logger.info("Init - Seed " + seed());
 
+        //Add the banks first since Clients/Mules depend on their existence
+        logger.info("NbBanks: " + parameters.nbBanks);
+        for (int i = 0; i < parameters.nbBanks; i++) {
+            String name = idFactory.nextMerchantName();
+            Bank b = new Bank(this, idFactory.nextBank());
+            banks.add(b);
+        }
+
         //Add the merchants
         final int numMerchants = (int) (parameters.nbMerchants * parameters.multiplier);
         logger.info("NbMerchants: " + numMerchants);
@@ -114,14 +122,6 @@ public abstract class PaySimState extends SimState {
             FirstPartyFraudster f = new FirstPartyFraudster(this, idFactory.nextPerson());
             fraudsters.add(f);
             schedule.scheduleRepeating(f);
-        }
-
-        //Add the banks
-        logger.info("NbBanks: " + parameters.nbBanks);
-        for (int i = 0; i < parameters.nbBanks; i++) {
-            String name = idFactory.nextMerchantName();
-            Bank b = new Bank(this, idFactory.nextBank());
-            banks.add(b);
         }
 
         //Add the clients
