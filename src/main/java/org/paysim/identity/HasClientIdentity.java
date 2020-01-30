@@ -5,5 +5,5 @@ package org.paysim.identity;
  * let's just use a dumb 1-method interface for now.
  */
 public interface HasClientIdentity {
-    public ClientIdentity getClientIdentity();
+    ClientIdentity getClientIdentity();
 }
