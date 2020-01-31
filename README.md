@@ -1,46 +1,103 @@
 ![](https://github.com/voutilad/paysim/workflows/Java%20CI/badge.svg)
 
-This is a fork of PaySim designed for use as a library. 
+# A Fork of PaySim - Simulating Mobile Money Networks
+This is a fork of [PaySim 2.0](https://github.com/EdgarLopezPhD/PaySim) designed for use as a library while maintaining some ability to run standalone (if desired).
 
-Key changes from the original include:
-- `Parameters` used statics for simulation params preventing concurrent usage and easy testing, so remove reliance on statics.
+It's first usage is in conjunction with [Neo4j](https://neo4j.com) to create a network graph, facilitating application of graph algorithms for detecting fraud characteristics.
+
+## Why Fork?
+Numerous high-level enhancements from the original include:
+- Implementation of First and Third Party fraudsters
+  - 1st Party Fraudsters steal or use fake identities to open new accounts and drain their value
+  - 3rd Party Fraudsters prey upon normal clients via "compromised" merchants (like via card skimming) and drain accounts
+- Incorporation of "identities" tied to clients to help facilitate First Party Fraud simulation including SSN, Email, and Phone Numbers
+
+For developers looking to leverage PaySim in an embedded sense, major changes include:
+- `Parameters` used Java `statics` for simulation params preventing concurrent usage and easy testing, so remove reliance on statics.
 - Relying on deducing the type of the actor based on their name prefix was annoying, so explicitly track a `SuperActor.Type` making it easier to know without string nonsense
 - PaySim was originally implemented as a single class relying on file IO, so abstract out the common parts (`PaySimState`) allowing for creation of an implementation that doesn't require writing simulation results to the file system
 - Embedding PaySim was hard due to the file IO requirements, so in conjunction with `PaySimState` implement an in-memory implementation that produces consumable results. (Current implementation is a `java.util.Iterator<Transaction>` that allows the simulation to get ahead of the consumer but 200k transactions using a `java.util.concurrent.ArrayBlockingQueue` as a buffer.)
+- MASON, the simulation framework, contains a LOT of features not needed for PaySim, so instead this project relies on [my fork](https://github.com/voutilad/mason) that slims it down.
+- Incorporation of [SL4j](http://www.slf4j.org/) as a logging framework instead of reliance purely on `System.out`/`System.err` 
 
 ## Getting Started
-There are a few prerequisites:
+It's pretty easy, all you need is a JDK environment.
+- Get and [install](https://adoptopenjdk.net) a recent JDK 11 instance for your platform. (Note: JDK 8 may work, but I'm not testing with it at the moment.)
+- Clone this repo...I can't provide full pre-packaged releases due to licensing caveats. (Long story short: AFL3 and GPL3 don't mix!)
+- Install a copy of [Apache Maven](https://maven.apache.org/download.cgi) for your system
 
-- Get and install a recent JDK 11 instance for your platform
-- You'll need to grab my fork of [mason](https://github.com/voutilad/mason) and install it in your local maven repo. (Simply `mvn install`.)
-
-### Embedding
-You can build a standalone uberjar using `mvn package`. It'll produce a jar in `./target` containing all dependencies.
-
-By default, the original PaySim class is wired up as the entry point, so the following will execute a simulation outputting to the file system:
-```bash
-$ java -jar target/paysim-2.0-voutilad-4.jar
+In the project directory, simply run:
+```shell script
+$ mvn install
 ```
 
-Feel free to take the jar and add it to your project or application.
+The above will both install the paysim library in your local Maven repo as well as create an easy to use "uberjar" in the `target` directory.
 
-### Extending
+To run the standalone PaySim like in the original project, you'd then run:
+
+```shell script
+$ java -jar ./target/paysim-2.1.0-SNAPSHOT.jar
+```
+
+### Embedding and Using in other Projects
+Until I host builds somewhere, the easiest way to get the code is via [jitpack.io](https://jitpack.io).
+
+#### Using Maven
+Add the jitpack repository:
+
+```xml
+<repositories>
+    <repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+    </repository>
+</repositories>
+```
+
+Add the dependency:
+```xml
+<dependency>
+    <groupId>com.github.voutilad</groupId>
+    <artifactId>paysim</artifactId>
+    <version>master-SNAPSHOT</version>
+</dependency>
+```
+
+#### Using Gradle
+Add the jitpack repository (assuming you use Groovy) to your `build.gradle` at the end of the repos list:
+```groovy
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+
+And the dependency:
+```groovy
+dependencies {
+        implementation 'com.github.voutilad:paysim:master-SNAPSHOT'
+}
+```
+
+### Developing and Extending
 If you'd like to create your own PaySim customization, extend the abstract `PaySimState` class.
 
 See `org.paysim.IteratingPaySim` as an example.
 
-## About the required Properties files
+## About the required Properties file and paramFiles
 Currently PaySim expects a handful of properties files to initialize the simulation state. You need to provide:
 
 - PaySim.properties -- the primary settings file
 - Supporting properties files -- see the `paramFiles` directory
 
-I recommend copying the existing ones in the project and distributing them with the jar.
+I recommend copying the existing ones in the project if you're adding PaySim to another project.
 
 > Note: the current version of PaySim requires aggregate financial transaction data to generate the simulated transactions. As such, it's capped at ~720 steps for now.
 
 ---
-# Original README.md
+# Original README.md pre-fork
 ## Project Leader
 
 Dr. Edgar Lopez-Rojas
