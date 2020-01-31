@@ -36,7 +36,7 @@ The above will both install the paysim library in your local Maven repo as well 
 To run the standalone PaySim like in the original project, you'd then run:
 
 ```shell script
-$ java -jar ./target/paysim-2.1.0-SNAPSHOT.jar
+$ java -jar ./target/paysim-2.1.0.jar
 ```
 
 ### Embedding and Using in other Projects
@@ -59,7 +59,7 @@ Add the dependency:
 <dependency>
     <groupId>com.github.voutilad</groupId>
     <artifactId>paysim</artifactId>
-    <version>master-SNAPSHOT</version>
+    <version>2.1.0</version>
 </dependency>
 ```
 
@@ -77,7 +77,7 @@ allprojects {
 And the dependency:
 ```groovy
 dependencies {
-        implementation 'com.github.voutilad:paysim:master-SNAPSHOT'
+        implementation 'com.github.voutilad:paysim:2.1.0'
 }
 ```
 
