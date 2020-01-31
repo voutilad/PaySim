@@ -1,4 +1,4 @@
-package org.paysim.actors;
+package org.paysim.identity;
 
 public class Properties {
     public static final String ID = "id";

@@ -1,7 +1,5 @@
 package org.paysim.identity;
 
-import org.paysim.actors.Properties;
-
 import java.util.HashMap;
 import java.util.Map;
 

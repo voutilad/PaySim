@@ -1,7 +1,5 @@
 package org.paysim.identity;
 
-import org.paysim.actors.Properties;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +13,24 @@ public class ClientIdentity extends Identity {
         this.email = email;
         this.ssn = ssn;
         this.phoneNumber = phoneNumber;
+    }
+
+    /**
+     * Creates a new ClientIdentity from this instance, replacing the given property with the provided Value.
+     *
+     * TODO: candidate for refactor of Properties into enum instead of Strings.
+     *
+     * @param property String name of property (See @{org.paysim.identity.Properties}
+     * @param value String value to use in place of old property value
+     * @return new ClientIdentity, copying
+     */
+    public ClientIdentity replaceProperty(String property, String value) {
+        switch (property) {
+            case Properties.EMAIL: return new ClientIdentity(id, name, value, ssn, phoneNumber);
+            case Properties.SSN: return new ClientIdentity(id, name, email, value, phoneNumber);
+            case Properties.PHONE: return new ClientIdentity(id, name, email, ssn, value);
+            default: return this;
+        }
     }
 
     @Override
