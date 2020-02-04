@@ -28,12 +28,19 @@ import java.util.zip.GZIPInputStream;
  * output from a known good version of PaySim run for <b>10 steps</b>.
  */
 public class SanityCheckTest {
-    private static final String testLog = "/test_rawLog.csv.gz";
+    private static final String nixTestLog = "/test_rawLog.csv.gz";
+    private static final String win32TestLog = "/seed_100000_win32.csv.gz";
 
     private Parameters parameters;
+    private String testLog;
 
     @BeforeEach
     void setup() {
+        if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
+            testLog = win32TestLog;
+        } else {
+            testLog = nixTestLog;
+        }
         parameters = new Parameters("PaySim.properties");
     }
 
@@ -85,7 +92,6 @@ public class SanityCheckTest {
     }
 
     @Test
-    @Disabled
     void sanityCheckIteratingPaySim() throws Exception {
         Path path = Paths.get(getClass().getResource(testLog).toURI());
         GZIPInputStream gzis = new GZIPInputStream(Files.newInputStream(path));
