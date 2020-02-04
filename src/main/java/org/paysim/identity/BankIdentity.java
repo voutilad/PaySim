@@ -7,7 +7,7 @@ public class BankIdentity extends Identity {
     private static final String BANK_IDENTIFIER = "B";
 
     public BankIdentity(String id, String name) {
-        super(id, BANK_IDENTIFIER + name);
+        super(BANK_IDENTIFIER + id, name);
     }
 
     @Override
