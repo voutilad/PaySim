@@ -1,13 +1,8 @@
 package org.paysim;
 
-import com.devskiller.jfairy.Bootstrap;
-import com.devskiller.jfairy.Fairy;
-import com.devskiller.jfairy.producer.person.Person;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.paysim.base.Transaction;
 import org.paysim.parameters.Parameters;
 
 import java.io.BufferedReader;
@@ -16,8 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;

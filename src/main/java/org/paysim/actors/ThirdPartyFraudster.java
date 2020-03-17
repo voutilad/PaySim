@@ -11,7 +11,6 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Hi, I'm Theo...the 3rd Party Fraudster. I like to acquire your account creds and steal your cash/credit.

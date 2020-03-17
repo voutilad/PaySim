@@ -2,11 +2,12 @@ package org.paysim.actors;
 
 import org.paysim.PaySimState;
 import org.paysim.identity.Identifiable;
-import org.paysim.identity.Identity;
 import org.paysim.parameters.Parameters;
 import org.paysim.utils.BoundedArrayDeque;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Deque;
+import java.util.List;
 
 public abstract class SuperActor implements Identifiable {
     protected final Deque<Client> prevInteractions;
