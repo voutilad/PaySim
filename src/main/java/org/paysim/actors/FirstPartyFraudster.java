@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Hi, I'm Finley...the First Party Fraudster!
@@ -99,7 +100,11 @@ public class FirstPartyFraudster extends SuperActor implements HasClientIdentity
         properties.add(getId());
         properties.add(getType().toString());
         properties.add(Integer.toString(fauxAccounts.size()));
-        properties.add(String.format("[%s]", String.join(",", fauxAccounts.toArray(new String[fauxAccounts.size()]))));
+        properties.add(
+                String.format("[%s]", String.join(",",
+                        fauxAccounts.stream()
+                                .map(Mule::toString).collect(Collectors.toList()))));
+
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, profit));
 
         return String.join(Output.OUTPUT_SEPARATOR, properties);

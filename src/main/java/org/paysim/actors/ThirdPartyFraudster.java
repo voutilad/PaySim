@@ -11,6 +11,7 @@ import sim.engine.SimState;
 import sim.engine.Steppable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Hi, I'm Theo...the 3rd Party Fraudster. I like to acquire your account creds and steal your cash/credit.
@@ -151,7 +152,7 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
         properties.add(getId());
         properties.add(getType().toString());
         properties.add(Integer.toString(uniqueVictims.size()));
-        properties.add(String.format("[%s]", String.join(",", uniqueVictims.toArray(new String[uniqueVictims.size()]))));
+        properties.add(String.format("[%s]", String.join(",", uniqueVictims)));
         properties.add(Output.fastFormatDouble(Output.PRECISION_OUTPUT, profit));
 
         return String.join(Output.OUTPUT_SEPARATOR, properties);
