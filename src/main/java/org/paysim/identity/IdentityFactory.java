@@ -25,13 +25,19 @@ public class IdentityFactory {
                 .withLocale(Locale.CANADA);
     }
 
+    protected String addSuffixToEmail(String email, String suffix) {
+        String[] parts = email.split("@");
+        assert parts.length == 2;
+        return parts[0] + suffix + "@" + parts[1];
+    }
+
     public ClientIdentity nextPerson() {
         Person p = builder.build().person();
 
         return new ClientIdentity(
                 getNextCreditCard(),
                 p.getFullName(),
-                p.getEmail(),
+                addSuffixToEmail(p.getEmail(), p.getNationalIdentityCardNumber().substring(0, 2)),
                 p.getNationalIdentityCardNumber(),
                 p.getTelephoneNumber());
     }
