@@ -52,6 +52,16 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
     }
 
     @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof Client) {
+            Client otherClient = (Client) obj;
+            // XXX: naive equality check for now...should push down to ClientIdentity?
+            return this.identity.id == otherClient.identity.id;
+        }
+        return false;
+    }
+
+    @Override
     public String getId() {
         return identity.id;
     }
