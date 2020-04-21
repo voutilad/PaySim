@@ -326,6 +326,7 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
                 newBalanceOrig, merchant, oldBalanceDest, newBalanceDest);
 
         t.setUnauthorizedOverdraft(isUnauthorizedOverdraft);
+        t.setSuccessful(!isUnauthorizedOverdraft);
         return t;
     }
 
@@ -412,6 +413,10 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
         double randomizedMeanTransaction = random.nextGaussian() * stdTransaction + expectedAvgTransaction;
 
         return BalancesClients.getOverdraftLimit(randomizedMeanTransaction);
+    }
+
+    public ClientProfile getClientProfile() {
+        return clientProfile;
     }
 
     @Override

@@ -43,10 +43,10 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
         return favoredMerchants.add(m);
     }
 
-    protected double pickTestChargeAmount(PaySimState state) {
-        // XXX: for now let's just say it's a "small" test charge with some variability
-        final double wobble = 1 + (1 / (state.getRNG().nextInt(50) + 1));
-        return state.getParameters().transferLimit * 0.05 * wobble;
+    protected double pickTestChargeAmount(PaySimState state, Client victim, String actionType) {
+        final double wobble = 1 + (1f / (state.getRNG().nextInt(50) + 1));
+        final double avgAmountForAction = victim.getClientProfile().getProfilePerAction(actionType).getAvgAmount();
+        return avgAmountForAction * 0.25 * wobble;
     }
 
     protected Merchant pickTestMerchant(PaySimState state) {
@@ -102,34 +102,33 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
         ArrayList<Transaction> transactions = new ArrayList<>();
         int step = (int) state.schedule.getSteps();
 
-        // XXX: Core 1st Party Fraud Logic
+        // XXX: Core 3rd Party Fraud Logic
         if (paysim.getRNG().nextDouble() < parameters.fraudProbability) {
             if (victims.isEmpty() || paysim.getRNG().nextBoolean(P_NEW_VICTIM)) {
                 // Time to find a new lucky victim
                 Client c = pickTargetClient(paysim);
-                c.setFraud(true);
                 Merchant m = pickTestMerchant(paysim);
-                Transaction testCharge = c.handlePayment(m, step, pickTestChargeAmount(paysim));
+                final double testChargeAmt = pickTestChargeAmount(paysim, c, Client.PAYMENT);
+                Transaction testCharge = c.handlePayment(m, step, testChargeAmt);
+                testCharge.setFraud(true);
+
                 if (testCharge.isSuccessful()) {
                     victims.add(c);
                     transactions.add(testCharge);
-                    // TODO: for now reuse pickTestChargeAmount, but come up with another way to gen the stolen amt
-                    Transaction xfer = c.handleTransfer(mule, step, pickTestChargeAmount(paysim));
+                    Transaction xfer = c.handleTransfer(mule, step, pickTestChargeAmount(paysim, c, Client.TRANSFER));
+                    xfer.setFraud(true);
                     if (xfer.isSuccessful()) {
                         transactions.add(xfer);
                     }
                 }
-                c.setFraud(false);
             } else {
                 // Repeat attack on a victim
                 pickRepeatVictim(paysim).ifPresent(c -> {
-                    c.setFraud(true);
-                    // TODO: for now reuse pickTestChargeAmount, but come up with another way to gen the stolen amt
-                    Transaction xfer = c.handleTransfer(mule, step, pickTestChargeAmount(paysim));
+                    Transaction xfer = c.handleTransfer(mule, step, pickTestChargeAmount(paysim, c, Client.TRANSFER));
+                    xfer.setFraud(true);
                     if (xfer.isSuccessful()) {
                         transactions.add(xfer);
                     }
-                    c.setFraud(false);
                 });
             }
         }
