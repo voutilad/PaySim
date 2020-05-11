@@ -1,8 +1,10 @@
 package org.paysim.identity;
 
 import com.devskiller.jfairy.Bootstrap;
+import com.devskiller.jfairy.Fairy;
 import com.devskiller.jfairy.producer.company.Company;
 import com.devskiller.jfairy.producer.person.Person;
+import ec.util.MersenneTwisterFast;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -16,13 +18,13 @@ import java.util.Set;
 public class IdentityFactory {
     private final Set<String> ccnSet = new HashSet<>();
 
-    final private Bootstrap.Builder builder;
+    final private Fairy fairy;
 
     public IdentityFactory(int randomSeed) {
-        builder = Bootstrap.builder()
+        fairy = Bootstrap.builder()
                 .withRandomSeed(randomSeed)
                 .withLocale(Locale.US)
-                .withLocale(Locale.CANADA);
+                .withLocale(Locale.CANADA).build();
     }
 
     protected String addSuffixToEmail(String email, String suffix) {
@@ -32,41 +34,41 @@ public class IdentityFactory {
     }
 
     public ClientIdentity nextPerson() {
-        Person p = builder.build().person();
+        Person p = fairy.person();
 
         return new ClientIdentity(
                 getNextCreditCard(),
                 p.getFullName(),
-                addSuffixToEmail(p.getEmail(), p.getNationalIdentityCardNumber().substring(0, 2)),
+                addSuffixToEmail(p.getEmail(), p.getNationalIdentityCardNumber().substring(0, 3)),
                 p.getNationalIdentityCardNumber(),
                 p.getTelephoneNumber());
     }
 
     public BankIdentity nextBank() {
-        Person p = builder.build().person();
+        Person p = fairy.person();
         return new BankIdentity(getNextVAT(), String.format("Bank of %s", p.getLastName()));
     }
 
     public MerchantIdentity nextMerchant() {
-        Company c = builder.build().company();
+        Company c = fairy.company();
         return new MerchantIdentity(c.getVatIdentificationNumber(), c.getName());
     }
 
     public String getNextVAT() {
-        Company c = builder.build().company();
+        Company c = fairy.company();
         return c.getVatIdentificationNumber();
     }
 
     public String getNextCreditCard() {
-        String ccn = builder.build().creditCard().getCardNumber();
+        String ccn = fairy.creditCard().getCardNumber();
         while (!ccnSet.add(ccn)) {
-            ccn = builder.build().creditCard().getCardNumber();
+            ccn = fairy.creditCard().getCardNumber();
         }
         return ccn;
     }
 
     public String nextMerchantName() {
-        Company c = builder.build().company();
+        Company c = fairy.company();
         return c.getName();
     }
 }
