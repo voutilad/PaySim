@@ -58,7 +58,7 @@ public class FirstPartyFraudster extends SuperActor implements HasClientIdentity
     public void step(SimState state) {
         PaySimState paysim = (PaySimState) state;
 
-        if (paysim.getRNG().nextDouble() < parameters.fraudProbability) {
+        if (paysim.getRNG().nextDouble() < parameters.firstPartyFraudProbability) {
             commitFraud(paysim);
         }
     }
@@ -133,7 +133,7 @@ public class FirstPartyFraudster extends SuperActor implements HasClientIdentity
     }
 
     @Override
-    public Map<String, String> getIdentityAsMap() {
+    public Map<String, Object> getIdentityAsMap() {
         return identity.asMap();
     }
 }

@@ -13,7 +13,9 @@ public class Parameters {
     private static String seedString;
     public final int seed;
     public final int nbClients, nbMerchants, nbBanks, nbFraudsters, nbSteps;
-    public final double multiplier, fraudProbability, transferLimit;
+    public final double multiplier, transferLimit;
+    public final float thirdPartyNewVictimProbability;
+    public final double firstPartyFraudProbability, thirdPartyFraudProbability, thirdPartyPercentHighRiskMerchants;
     public final String aggregatedTransactions, maxOccurrencesPerClient, initialBalancesDistribution,
             overdraftLimits, clientsProfilesFile, transactionsTypes;
     public final String typologiesFolder, outputPath;
@@ -42,7 +44,26 @@ public class Parameters {
         nbMerchants = Integer.parseInt(props.getProperty("nbMerchants"));
         nbBanks = Integer.parseInt(props.getProperty("nbBanks"));
 
-        fraudProbability = Double.parseDouble(props.getProperty("fraudProbability"));
+        // Support older props files for now until I can migrate them
+        if (props.get("fraudProbability") != null) {
+            double probability = Double.parseDouble(props.getProperty("fraudProbability"));
+            logger.warn("HEADS UP! the 'fraudProbability' property is deprecated, but was found in your properties file");
+            logger.warn("PaySim will set both 1st and 3rd party fraud probability to the value of 'fraudProbability' ({})", probability);
+            firstPartyFraudProbability = probability;
+            thirdPartyFraudProbability = probability;
+        } else {
+            firstPartyFraudProbability = Double.parseDouble(props.getProperty("firstPartyFraudProbability"));
+            thirdPartyFraudProbability = Double.parseDouble(props.getProperty("thirdPartyFraudProbability"));
+        }
+
+        String nvp = props.getProperty("thirdPartyNewVictimProbability");
+        if (nvp == null || nvp.equals("0.4")) {
+            thirdPartyNewVictimProbability = 0.4f;
+        } else {
+            thirdPartyNewVictimProbability =
+            Float.parseFloat(props.getProperty("thirdPartyNewVictimProbability", "0.4"));
+        }
+        thirdPartyPercentHighRiskMerchants = Double.parseDouble(props.getProperty("thirdPartyPercentHighRiskMerchants", "0.02"));
         transferLimit = Double.parseDouble(props.getProperty("transferLimit"));
 
         transactionsTypes = props.getProperty("transactionsTypes");
@@ -86,7 +107,10 @@ public class Parameters {
         sb.append("multiplier=" + multiplier + System.lineSeparator());
         sb.append("nbFraudsters=" + nbFraudsters + System.lineSeparator());
         sb.append("nbMerchants=" + nbMerchants + System.lineSeparator());
-        sb.append("fraudProbability=" + fraudProbability + System.lineSeparator());
+        sb.append("firstPartyFraudProbability=" + firstPartyFraudProbability + System.lineSeparator());
+        sb.append("thirdPartyFraudProbability=" + thirdPartyFraudProbability + System.lineSeparator());
+        sb.append("thirdPartyNewVictimProbability=" + thirdPartyNewVictimProbability + System.lineSeparator());
+        sb.append("thirdPartyPercentHighRiskMerchants=" + thirdPartyPercentHighRiskMerchants + System.lineSeparator());
         sb.append("transferLimit=" + transferLimit + System.lineSeparator());
         sb.append("transactionsTypes=" + transactionsTypes + System.lineSeparator());
         sb.append("aggregatedTransactions=" + aggregatedTransactions + System.lineSeparator());

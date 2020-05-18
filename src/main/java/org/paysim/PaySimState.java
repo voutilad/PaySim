@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class PaySimState extends SimState {
-    public static final double PAYSIM_VERSION = 2.1;
+    public static final double PAYSIM_VERSION = 2.3;
 
     private final Logger logger = LoggerFactory.getLogger(PaySimState.class);
     protected Parameters parameters;
@@ -94,10 +94,12 @@ public abstract class PaySimState extends SimState {
             merchants.add(new Merchant(this, idFactory.nextMerchant()));
         }
 
-        // We take a sample of the merchant population and set some as "high risk" (2% arbitrarily)
+        // We take a sample of the merchant population and set some as "high risk"
         List<Merchant> highRiskMerchants = new ArrayList<>();
-        for (int i = 0; i < numMerchants / 50; i++) {
-            highRiskMerchants.add(merchants.get(random.nextInt(numMerchants)));
+        for (int i = 0; i < numMerchants * parameters.thirdPartyPercentHighRiskMerchants; i++) {
+            Merchant m = merchants.get(random.nextInt(numMerchants));
+            m.setHighRisk(true);
+            highRiskMerchants.add(m);
         }
 
         // Fraudsters...
@@ -111,7 +113,7 @@ public abstract class PaySimState extends SimState {
             ThirdPartyFraudster f = new ThirdPartyFraudster(this, idFactory.nextPerson());
 
             // 3rd Party Fraudsters select some "favorites" of the high-risk merchants. A Fraudster will have
-            // som probability of targeting clients that used these merchants. The remaining events are random
+            // some probability of targeting clients that used these merchants. The remaining events are random
             // client targets from the universe
             f.addFavoredMerchant(highRiskMerchants.get(random.nextInt(highRiskMerchants.size())));
             f.addFavoredMerchant(highRiskMerchants.get(random.nextInt(highRiskMerchants.size())));

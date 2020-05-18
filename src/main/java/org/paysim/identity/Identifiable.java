@@ -7,5 +7,5 @@ public interface Identifiable {
     String getName();
     Identity getIdentity();
 
-    Map<String, String> getIdentityAsMap();
+    Map<String, Object> getIdentityAsMap();
 }

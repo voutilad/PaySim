@@ -7,4 +7,5 @@ public class Properties {
     public static final String EMAIL = "email";
     public static final String SSN = "ssn";
     public static final String CCN = "ccn";
+    public static final String HIGH_RISK = "highRisk";
 }

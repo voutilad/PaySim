@@ -22,5 +22,5 @@ public abstract class Identity {
         return name;
     }
 
-    public abstract Map<String, String> asMap();
+    public abstract Map<String, Object> asMap();
 }

@@ -34,8 +34,8 @@ public class ClientIdentity extends Identity {
     }
 
     @Override
-    public Map<String, String> asMap() {
-        Map<String, String> map = new HashMap<>();
+    public Map<String, Object> asMap() {
+        Map<String, Object> map = new HashMap<>();
         map.put(Properties.NAME, name);
         map.put(Properties.EMAIL, email);
         map.put(Properties.PHONE, phoneNumber);

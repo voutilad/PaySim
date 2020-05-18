@@ -22,8 +22,6 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
     private final Set<Client> victims;
     private final Set<Merchant> favoredMerchants;
 
-    private final float P_NEW_VICTIM = 0.4f;
-
     public ThirdPartyFraudster(PaySimState state, ClientIdentity identity) {
         super(state);
         this.identity = identity;
@@ -103,8 +101,8 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
         int step = (int) state.schedule.getSteps();
 
         // XXX: Core 3rd Party Fraud Logic
-        if (paysim.getRNG().nextDouble() < parameters.fraudProbability) {
-            if (victims.isEmpty() || paysim.getRNG().nextBoolean(P_NEW_VICTIM)) {
+        if (paysim.getRNG().nextDouble() < parameters.thirdPartyFraudProbability) {
+            if (victims.isEmpty() || paysim.getRNG().nextBoolean(parameters.thirdPartyNewVictimProbability)) {
                 // Time to find a new lucky victim
                 Client c = pickTargetClient(paysim);
                 Merchant m = pickTestMerchant(paysim);
@@ -177,7 +175,7 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
     }
 
     @Override
-    public Map<String, String> getIdentityAsMap() {
+    public Map<String, Object> getIdentityAsMap() {
         return identity.asMap();
     }
 }

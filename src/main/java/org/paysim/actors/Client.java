@@ -82,7 +82,7 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
     }
 
     @Override
-    public Map<String, String> getIdentityAsMap() {
+    public Map<String, Object> getIdentityAsMap() {
         return identity.asMap();
     }
 

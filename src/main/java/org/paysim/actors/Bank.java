@@ -36,7 +36,7 @@ public class Bank extends SuperActor {
     }
 
     @Override
-    public Map<String, String> getIdentityAsMap() {
+    public Map<String, Object> getIdentityAsMap() {
         return identity.asMap();
     }
 }

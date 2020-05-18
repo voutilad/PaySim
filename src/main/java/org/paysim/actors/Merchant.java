@@ -14,6 +14,10 @@ public class Merchant extends SuperActor {
         this.identity = identity;
     }
 
+    public void setHighRisk(boolean isHighRisk) {
+        this.identity.setHighRisk(isHighRisk);
+    }
+
     @Override
     public Type getType() {
         return Type.MERCHANT;
@@ -35,7 +39,7 @@ public class Merchant extends SuperActor {
     }
 
     @Override
-    public Map<String, String> getIdentityAsMap() {
+    public Map<String, Object> getIdentityAsMap() {
         return identity.asMap();
     }
 }

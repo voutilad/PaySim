@@ -11,8 +11,8 @@ public class BankIdentity extends Identity {
     }
 
     @Override
-    public Map<String, String> asMap() {
-        Map<String, String> map = new HashMap<>();
+    public Map<String, Object> asMap() {
+        Map<String, Object> map = new HashMap<>();
         map.put(Properties.NAME, name);
         return map;
     }
