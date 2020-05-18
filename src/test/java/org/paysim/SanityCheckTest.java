@@ -48,7 +48,8 @@ public class SanityCheckTest {
 
     @Test
     void canAbortASimulation() throws InterruptedException {
-        IteratingPaySim sim = new IteratingPaySim(parameters, 1);
+        final String workerName = "abortTestWorker";
+        IteratingPaySim sim = new IteratingPaySim(parameters, 1, workerName);
         sim.run();
         Assertions.assertNotNull(sim.next());
         // between the above and the below lines, chances are our worker will add another to the queue
@@ -57,7 +58,7 @@ public class SanityCheckTest {
         // This should drain anything left in the queue. It's possible we ended up with another item due
         // to a TOCTOU flaw in the current version
         // XXX: this sleep()/next() is to overcome races on Win10
-        Thread.sleep(100);
+        Thread.sleep(200);
         sim.next();
 
         Assertions.assertNull(sim.next());
@@ -70,12 +71,12 @@ public class SanityCheckTest {
         Thread[] threads = new Thread[cnt];
         Thread.enumerate(threads);
         Assertions.assertFalse(Arrays.stream(threads)
-                .anyMatch(thread -> thread.getName().startsWith(IteratingPaySim.WORKER_NAME)));
+                .anyMatch(thread -> thread.getName().startsWith(workerName)));
     }
 
     @Test
     void iteratingPaySimTracksGlobalStepOrder() throws Exception {
-        IteratingPaySim sim = new IteratingPaySim(parameters, 1);
+        IteratingPaySim sim = new IteratingPaySim(parameters);
         sim.run();
         final AtomicInteger lastStep = new AtomicInteger(0);
         sim.forEachRemaining(tx ->

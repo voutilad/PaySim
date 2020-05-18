@@ -37,16 +37,22 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     private BlockingQueue<Transaction> queue;
     private static int QUEUE_DEPTH = 200_000;
 
+    protected static final String DEFAULT_WORKER_NAME = "SimulationWorker";
+    protected final String workerName;
     private SimulationWorker worker;
-    protected static String WORKER_NAME = "SimulationWorker";
 
     private AtomicBoolean running = new AtomicBoolean();
     private AtomicInteger stepCounter = new AtomicInteger(0);
 
-    public IteratingPaySim(Parameters parameters, int queueDepth) {
+    public IteratingPaySim(Parameters parameters, int queueDepth, String workerName) {
         super(parameters);
         this.queue = new ArrayBlockingQueue<>(queueDepth);
+        this.workerName = workerName;
         worker = new SimulationWorker(this);
+    }
+
+    public IteratingPaySim(Parameters parameters, int queueDepth) {
+        this(parameters, queueDepth, DEFAULT_WORKER_NAME);
     }
 
     public IteratingPaySim(Parameters parameters) {
@@ -74,7 +80,7 @@ public class IteratingPaySim extends PaySimState implements Iterator<Transaction
     public synchronized void run() {
         if (running.compareAndSet(false, true)) {
             stepCounter.set(0);
-            final Thread t = new Thread(worker, WORKER_NAME);
+            final Thread t = new Thread(worker, workerName);
             t.start();
             logger.debug(String.format("started worker thread: %s", t.getName()));
         } else {
