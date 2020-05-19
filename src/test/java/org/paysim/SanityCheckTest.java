@@ -18,7 +18,7 @@ import java.util.zip.GZIPInputStream;
 /**
  * This is a naive approach to sanity checking any logic changes to the
  * PaySimState base class and its derivatives using a "gold standard"
- * output from a known good version of PaySim run for <b>10 steps</b>.
+ * output from a known good version of PaySim run for <b>8 steps</b>.
  */
 public class SanityCheckTest {
     private static final String nixTestLog = "/test_rawLog.csv.gz";
@@ -28,13 +28,14 @@ public class SanityCheckTest {
     private String testLog;
 
     @BeforeEach
-    void setup() {
+    void setup() throws Exception {
         if (System.getProperty("os.name").toLowerCase().startsWith("win")) {
             testLog = win32TestLog;
         } else {
             testLog = nixTestLog;
         }
-        parameters = new Parameters("PaySim.properties");
+        Path path = Paths.get(getClass().getResource("/PaySim.properties").toURI());
+        parameters = new Parameters(path.toString());
     }
 
     @Test
