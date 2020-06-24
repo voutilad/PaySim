@@ -12,6 +12,7 @@ import org.paysim.identity.Identifiable;
 import org.paysim.identity.Identity;
 import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.BalancesClients;
+import org.paysim.utils.BoundedArrayDeque;
 import org.paysim.utils.RandomCollection;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -34,6 +35,7 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
     private double expectedAvgTransaction = 0;
     private double initialBalance;
     private final ClientIdentity identity;
+    private final List<Merchant> usedMerchants = new ArrayList<>();
 
     Client(PaySimState state, ClientIdentity identity) {
         super(state);
@@ -111,6 +113,24 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
                     return;
                 }
             }
+        }
+    }
+
+    /**
+     * Simulate the "stickiness" of Merchants. Clients tend to patronize the same merchants
+     * frequently in real life, so skew towards picking a previous merchant over a net-new one.
+     *
+     * @param state reference to the PaySimState instance driving the simulation
+     * @return the selected Merchant
+     */
+    private Merchant pickMerchant(PaySimState state) {
+        if (usedMerchants.size() > 0 &&
+                state.getRNG().nextDouble() < state.getParameters().merchantReuseProbability) {
+            return usedMerchants.get(state.getRNG().nextInt(usedMerchants.size()));
+        } else  { // find a new merchant
+            Merchant m = state.pickRandomMerchant();
+            usedMerchants.add(m);
+            return m;
         }
     }
 
@@ -222,7 +242,7 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
 
         switch (action) {
             case CASH_IN:
-                transactions.add(handleCashIn(state.pickRandomMerchant(), step, amount));
+                transactions.add(handleCashIn(pickMerchant(state), step, amount));
                 break;
             case CASH_OUT:
                 transactions.add(handleCashOut(state, step, amount));
@@ -231,7 +251,7 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
                 transactions.add(handleDebit(state, step, amount));
                 break;
             case PAYMENT:
-                transactions.add(handlePayment(state.pickRandomMerchant(), step, amount));
+                transactions.add(handlePayment(pickMerchant(state), step, amount));
                 break;
             case TRANSFER:
                 Client clientTo = state.pickRandomClient(getId());

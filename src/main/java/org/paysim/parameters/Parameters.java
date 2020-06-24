@@ -15,7 +15,8 @@ public class Parameters {
     public final int nbClients, nbMerchants, nbBanks, nbFraudsters, nbSteps;
     public final double multiplier, transferLimit;
     public final float thirdPartyNewVictimProbability;
-    public final double firstPartyFraudProbability, thirdPartyFraudProbability, thirdPartyPercentHighRiskMerchants;
+    public final double firstPartyFraudProbability, merchantReuseProbability,
+            thirdPartyFraudProbability, thirdPartyPercentHighRiskMerchants;
     public final String aggregatedTransactions, maxOccurrencesPerClient, initialBalancesDistribution,
             overdraftLimits, clientsProfilesFile, transactionsTypes;
     public final String typologiesFolder, outputPath;
@@ -55,6 +56,9 @@ public class Parameters {
             firstPartyFraudProbability = Double.parseDouble(props.getProperty("firstPartyFraudProbability"));
             thirdPartyFraudProbability = Double.parseDouble(props.getProperty("thirdPartyFraudProbability"));
         }
+
+        // XXX: 0.9 based on some Python simulations. May change this later.
+        merchantReuseProbability = Double.parseDouble(props.getProperty("merchantReuseProbability", "0.9"));
 
         String nvp = props.getProperty("thirdPartyNewVictimProbability");
         if (nvp == null || nvp.equals("0.4")) {
@@ -108,6 +112,7 @@ public class Parameters {
         sb.append("nbFraudsters=" + nbFraudsters + System.lineSeparator());
         sb.append("nbMerchants=" + nbMerchants + System.lineSeparator());
         sb.append("firstPartyFraudProbability=" + firstPartyFraudProbability + System.lineSeparator());
+        sb.append("merchantReuseProbability=" + merchantReuseProbability + System.lineSeparator());
         sb.append("thirdPartyFraudProbability=" + thirdPartyFraudProbability + System.lineSeparator());
         sb.append("thirdPartyNewVictimProbability=" + thirdPartyNewVictimProbability + System.lineSeparator());
         sb.append("thirdPartyPercentHighRiskMerchants=" + thirdPartyPercentHighRiskMerchants + System.lineSeparator());
