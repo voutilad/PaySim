@@ -2,12 +2,13 @@ package org.paysim.utils;
 
 import org.paysim.base.Transaction;
 
+import java.lang.reflect.Constructor;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
-
+// TODO: rip out all of this stuff
 public class DatabaseHandler {
 
     private Connection con = null;
@@ -69,8 +70,9 @@ class DBase {
                               String db_password) {
         Connection conn;
         try {
-            Class clazz = Class.forName("com.mysql.jdbc.Driver");
-            clazz.getDeclaredConstructor().newInstance();
+            Class<?> clazz = Class.forName("com.mysql.jdbc.Driver");
+            Constructor<?> cons = clazz.getDeclaredConstructor();
+            cons.newInstance();
 
             conn = DriverManager.getConnection(db_connect_str, db_userid,
                     db_password);
