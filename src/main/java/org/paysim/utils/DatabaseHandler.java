@@ -69,7 +69,8 @@ class DBase {
                               String db_password) {
         Connection conn;
         try {
-            Class.forName("com.mysql.jdbc.Driver").newInstance();
+            Class clazz = Class.forName("com.mysql.jdbc.Driver");
+            clazz.getDeclaredConstructor().newInstance();
 
             conn = DriverManager.getConnection(db_connect_str, db_userid,
                     db_password);

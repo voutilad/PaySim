@@ -5,6 +5,7 @@ import org.paysim.base.Transaction;
 import org.paysim.parameters.ActionTypes;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,7 +77,7 @@ class Aggregator {
     private static double getTruncatedDouble(double d) {
         try {
             return new BigDecimal(d)
-                    .setScale(DOUBLE_PRECISION, BigDecimal.ROUND_HALF_UP)
+                    .setScale(DOUBLE_PRECISION, RoundingMode.HALF_UP)
                     .doubleValue();
         } catch (Exception e) {
             return 0;
