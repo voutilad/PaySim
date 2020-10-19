@@ -15,7 +15,8 @@ public class Parameters {
     public final int nbClients, nbMerchants, nbBanks, nbFraudsters, nbSteps;
     public final double multiplier, transferLimit;
     public final float thirdPartyNewVictimProbability;
-    public final double firstPartyFraudProbability, merchantReuseProbability,
+    public final double firstPartyFraudProbability, clientReuseProbability,
+            clientAcquaintanceProbability, merchantReuseProbability,
             thirdPartyFraudProbability, thirdPartyPercentHighRiskMerchants;
     public final String aggregatedTransactions, maxOccurrencesPerClient, initialBalancesDistribution,
             overdraftLimits, clientsProfilesFile, transactionsTypes;
@@ -59,6 +60,10 @@ public class Parameters {
 
         // XXX: 0.9 based on some Python simulations. May change this later.
         merchantReuseProbability = Double.parseDouble(props.getProperty("merchantReuseProbability", "0.9"));
+
+        // XXX: wags
+        clientReuseProbability = Double.parseDouble(props.getProperty("clientReuseProbability", "0.9"));
+        clientAcquaintanceProbability = Double.parseDouble(props.getProperty("clientAcquaintanceProbability", "0.9"));
 
         String nvp = props.getProperty("thirdPartyNewVictimProbability");
         if (nvp == null || nvp.equals("0.4")) {

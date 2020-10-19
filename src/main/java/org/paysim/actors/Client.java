@@ -12,7 +12,6 @@ import org.paysim.identity.Identifiable;
 import org.paysim.identity.Identity;
 import org.paysim.parameters.ActionTypes;
 import org.paysim.parameters.BalancesClients;
-import org.paysim.utils.BoundedArrayDeque;
 import org.paysim.utils.RandomCollection;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -34,8 +33,10 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
     private int countTransferTransactions = 0;
     private double expectedAvgTransaction = 0;
     private double initialBalance;
+
     private final ClientIdentity identity;
     private final List<Merchant> usedMerchants = new ArrayList<>();
+    private final List<Client> usedClients = new ArrayList<>();
 
     Client(PaySimState state, ClientIdentity identity) {
         super(state);
@@ -131,6 +132,29 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
             Merchant m = state.pickRandomMerchant();
             usedMerchants.add(m);
             return m;
+        }
+    }
+
+    /**
+     * Simulate "acquaintances" of Clients. Clients tend to send money to known friends or
+     * acquaintances and seldom send money to strangers for goods/services. (Think buying
+     * things off strangers on the internet.)
+     *
+     * @param state reference to the PaySimState instance driving the simulation
+     * @return the selected Client
+     */
+    private Client pickClient(PaySimState state) {
+        if (usedClients.size() > 0 &&
+                state.getRNG().nextDouble() < state.getParameters().clientReuseProbability) {
+            return usedClients.get(state.getRNG().nextInt(usedClients.size()));
+        } else { // find a new client
+            Client c = state.pickRandomClient(getId());
+            if (state.getRNG().nextDouble() < state.getParameters().clientAcquaintanceProbability) {
+                // turns out they're friends...not strangers
+                usedClients.add(c);
+                c.addAcquaintance(this);
+            }
+            return c;
         }
     }
 
@@ -254,7 +278,7 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
                 transactions.add(handlePayment(pickMerchant(state), step, amount));
                 break;
             case TRANSFER:
-                Client clientTo = state.pickRandomClient(getId());
+                Client clientTo = pickClient(state);
                 double reducedAmount = amount;
                 boolean lastTransferFailed = false;
 
@@ -437,6 +461,12 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
 
     public ClientProfile getClientProfile() {
         return clientProfile;
+    }
+
+    public void addAcquaintance(Client c) {
+        if (c != this) {
+            usedClients.add(c);
+        }
     }
 
     @Override
