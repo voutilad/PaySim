@@ -2,6 +2,7 @@ package org.paysim;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.paysim.parameters.Parameters;
 
@@ -20,6 +21,7 @@ import java.util.zip.GZIPInputStream;
  * PaySimState base class and its derivatives using a "gold standard"
  * output from a known good version of PaySim run for <b>8 steps</b>.
  */
+@Disabled
 public class SanityCheckTest {
     private static final String nixTestLog = "/test_rawLog.csv.gz";
     private static final String win32TestLog = "/seed_100000_win32.csv.gz";

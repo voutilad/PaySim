@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.paysim</groupId>
   <artifactId>paysim</artifactId>
-  <version>2.4.0</version>
+  <version>2.5.0</version>
   <build>
     <plugins>
       <plugin>
@@ -12,6 +12,9 @@
         <configuration>
           <source>8</source>
           <target>8</target>
+          <compilerArgs>
+            <arg>-Xlint:all</arg>
+          </compilerArgs>
         </configuration>
       </plugin>
       <plugin>

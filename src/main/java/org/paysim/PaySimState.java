@@ -82,9 +82,7 @@ public abstract class PaySimState extends SimState {
         //Add the banks first since Clients/Mules depend on their existence
         logger.info("NbBanks: " + parameters.nbBanks);
         for (int i = 0; i < parameters.nbBanks; i++) {
-            String name = idFactory.nextMerchantName();
-            Bank b = new Bank(this, idFactory.nextBank());
-            banks.add(b);
+            banks.add(new Bank(this, idFactory.nextBank()));
         }
 
         //Add the merchants
