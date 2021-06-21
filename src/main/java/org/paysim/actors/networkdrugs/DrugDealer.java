@@ -28,17 +28,17 @@ public class DrugDealer extends Client {
         }
     }
 
-    private boolean wantsToCashOutProfit(){
+    private boolean wantsToCashOutProfit() {
         //TODO: implement a randomized version
         return drugMoneyInAccount > thresholdForCashOut;
     }
 
-    private double pickAmountCashOutProfit(){
+    private double pickAmountCashOutProfit() {
         //TODO: implement a randomized version
         return thresholdForCashOut;
     }
 
-    protected void addMoneyFromDrug(double amount){
+    protected void addMoneyFromDrug(double amount) {
         drugMoneyInAccount += amount;
     }
 }

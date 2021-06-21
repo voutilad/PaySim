@@ -1,5 +1,6 @@
 package org.paysim.base;
 
+import com.opencsv.bean.CsvBindByName;
 import org.paysim.actors.SuperActor;
 import org.paysim.output.Output;
 
@@ -9,28 +10,42 @@ import java.util.ArrayList;
 public class Transaction implements Serializable {
     private static final long serialVersionUID = 1L;
     private final int step;
+
+    @CsvBindByName
     private int globalStep = -1;
+
+    @CsvBindByName
     private final String action;
+
+    @CsvBindByName
     private final double amount;
 
+    @CsvBindByName
     private final String idOrig;
+    @CsvBindByName
     private final String nameOrig;
+    @CsvBindByName
     private final SuperActor.Type typeOrig;
     private final double oldBalanceOrig, newBalanceOrig;
 
+    @CsvBindByName
     private final String idDest;
+    @CsvBindByName
     private final String nameDest;
+    @CsvBindByName
     private final SuperActor.Type typeDest;
     private final double oldBalanceDest, newBalanceDest;
 
+    @CsvBindByName
     private boolean isFraud = false;
+    @CsvBindByName
     private boolean isFlaggedFraud = false;
     private boolean isUnauthorizedOverdraft = false;
     private boolean isSuccessful = false;
 
     /**
      * Record pertinent details of a financial transaction, getting values from an originator and a destination.
-     *
+     * <p>
      * Implemented in such a way as to not purposely keep references to {SuperActor} instances since it's possible
      * a large quantity of Transactions may be kept in memory/on-heap at a time.
      *
@@ -63,7 +78,7 @@ public class Transaction implements Serializable {
         this.newBalanceDest = newBalanceDest;
     }
 
-    public boolean isFailedTransaction(){
+    public boolean isFailedTransaction() {
         return isFlaggedFraud || isUnauthorizedOverdraft;
     }
 
@@ -156,7 +171,7 @@ public class Transaction implements Serializable {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         ArrayList<String> properties = new ArrayList<>();
 
         properties.add(String.valueOf(step));

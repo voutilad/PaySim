@@ -36,8 +36,8 @@ public class ClientsProfiles {
             }
         }
 
-        for (RandomCollection profile: profilePickerPerAction.values()) {
-            if (profile.isEmpty()){
+        for (RandomCollection profile : profilePickerPerAction.values()) {
+            if (profile.isEmpty()) {
                 logger.warn("missing action in " + filename);
                 break;
             }
@@ -52,8 +52,8 @@ public class ClientsProfiles {
         return profilePickerPerAction.get(action).next();
     }
 
-    public void setRandom(MersenneTwisterFast random){
-        for (RandomCollection profilePicker : profilePickerPerAction.values()){
+    public void setRandom(MersenneTwisterFast random) {
+        for (RandomCollection profilePicker : profilePickerPerAction.values()) {
             profilePicker.setRandom(random);
         }
     }

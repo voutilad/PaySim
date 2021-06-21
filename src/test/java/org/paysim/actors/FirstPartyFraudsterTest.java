@@ -8,8 +8,6 @@ import org.paysim.identity.ClientIdentity;
 import org.paysim.parameters.Parameters;
 
 import java.util.HashSet;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 public class FirstPartyFraudsterTest {
     private Parameters parameters;
@@ -24,13 +22,14 @@ public class FirstPartyFraudsterTest {
         // XXX: setup for this test sucks, run sim with large queue, drain sim. Should use a testing paysim version.
         IteratingPaySim sim = new IteratingPaySim(parameters, 100000);
         sim.run();
-        sim.forEachRemaining(t -> {});
+        sim.forEachRemaining(t -> {
+        });
 
         ClientIdentity fpfIdentity = sim.generateIdentity();
         FirstPartyFraudster fpf = new FirstPartyFraudster(sim, fpfIdentity, 2);
 
         // Run 9 times...should generate collision guaranteed if bad logic is in place
-        for (int i=0; i<9; i++) {
+        for (int i = 0; i < 9; i++) {
             fpf.commitFraud(sim);
         }
 

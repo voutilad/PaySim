@@ -5,7 +5,7 @@ import java.util.Collection;
 
 /**
  * A naive sliding buffer based on an ArrayDeque.
- *
+ * <p>
  * Sets a finite max size and enforces it by dropping the last item if size maxes out.
  *
  * @param <T>

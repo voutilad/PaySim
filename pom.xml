@@ -46,11 +46,20 @@
                 <version>3.2.1</version>
                 <configuration>
                     <artifactSet>
+                        <excludes>
+                            <exclude>commons-lang:*</exclude>
+                        </excludes>
                         <includes>
                             <include>org/paysim/**</include>
+                            <!-- OpenCSV -->
+                            <include>com.opencsv:*</include>
+                            <include>commons-beanutils:*</include>
+                            <include>commons-text:*</include>
+                            <include>org.apache.commons:commons-lang3</include>
+
+                            <!-- Other stuff -->
                             <include>org.apache.commons:*</include>
                             <include>commons-configuration:*</include>
-                            <include>commons-lang:*</include>
                             <include>commons-collections:*</include>
                             <include>org.slf4j:*</include>
                             <include>org.apache.tinkerpop:*</include>
@@ -93,6 +102,11 @@
             <version>20-voutilad-1</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.apache.tinkerpop</groupId>
             <artifactId>tinkergraph-gremlin</artifactId>
             <version>3.3.4</version>
@@ -118,6 +132,11 @@
             <artifactId>junit-jupiter</artifactId>
             <scope>test</scope>
             <version>5.5.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+            <version>5.4</version>
         </dependency>
     </dependencies>
 </project>

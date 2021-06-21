@@ -34,7 +34,7 @@ public class StepActionProfile {
     }
 
     @Override
-    public String toString(){
+    public String toString() {
         ArrayList<String> properties = new ArrayList<>();
 
         properties.add(action);

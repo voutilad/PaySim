@@ -34,6 +34,7 @@ public class ThirdPartyFraudster extends SuperActor implements HasClientIdentity
 
     /**
      * These are the merchants I've found a way to breach...or maybe in cahoots with.
+     *
      * @param m a Merchant in the simulation
      * @return {@code true} (as specified by {@link Collection#add})
      */

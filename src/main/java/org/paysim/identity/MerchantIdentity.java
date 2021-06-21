@@ -1,10 +1,14 @@
 package org.paysim.identity;
 
+import com.opencsv.bean.CsvBindByName;
+
 import java.util.HashMap;
 import java.util.Map;
 
 public class MerchantIdentity extends Identity {
     private static final String MERCHANT_IDENTIFIER = "M";
+
+    @CsvBindByName
     private boolean isHighRisk;
 
     protected MerchantIdentity(String id, String name, boolean isHighRisk) {

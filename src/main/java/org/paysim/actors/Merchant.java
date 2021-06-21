@@ -1,5 +1,6 @@
 package org.paysim.actors;
 
+import com.opencsv.bean.CsvRecurse;
 import org.paysim.PaySimState;
 import org.paysim.identity.Identity;
 import org.paysim.identity.MerchantIdentity;
@@ -7,6 +8,7 @@ import org.paysim.identity.MerchantIdentity;
 import java.util.Map;
 
 public class Merchant extends SuperActor {
+    @CsvRecurse
     private final MerchantIdentity identity;
 
     public Merchant(PaySimState state, MerchantIdentity identity) {

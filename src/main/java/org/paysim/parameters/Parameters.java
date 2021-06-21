@@ -70,7 +70,7 @@ public class Parameters {
             thirdPartyNewVictimProbability = 0.4f;
         } else {
             thirdPartyNewVictimProbability =
-            Float.parseFloat(props.getProperty("thirdPartyNewVictimProbability", "0.4"));
+                    Float.parseFloat(props.getProperty("thirdPartyNewVictimProbability", "0.4"));
         }
         thirdPartyPercentHighRiskMerchants = Double.parseDouble(props.getProperty("thirdPartyPercentHighRiskMerchants", "0.02"));
         transferLimit = Double.parseDouble(props.getProperty("transferLimit"));

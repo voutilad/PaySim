@@ -58,7 +58,7 @@ class SummaryBuilder {
 
     private static double objectiveFunctionSteps(StepsProfiles targetStepsProfiles, StepsProfiles simulationStepsProfiles, StringBuilder summaryBuilder) {
         Map<String, Function<StepActionProfile, Double>> statExtractor = new HashMap<>();
-        Function<StepActionProfile, Long>  getCount = StepActionProfile::getCount;
+        Function<StepActionProfile, Long> getCount = StepActionProfile::getCount;
         Function<StepActionProfile, Double> getCountDouble = getCount.andThen(Long::doubleValue);
 
         statExtractor.put("Average amount", StepActionProfile::getAvgAmount);
@@ -68,7 +68,7 @@ class SummaryBuilder {
         double totalNRMSE = 0;
         summaryBuilder.append(SEPARATOR);
         summaryBuilder.append(Output.EOL_CHAR);
-        for (String estimator: statExtractor.keySet()) {
+        for (String estimator : statExtractor.keySet()) {
             Map<String, ArrayList<Double>> targetSeries = targetStepsProfiles.computeSeries(statExtractor.get(estimator));
             Map<String, ArrayList<Double>> simulationSeries = simulationStepsProfiles.computeSeries(statExtractor.get(estimator));
             for (String action : ActionTypes.getActions()) {
@@ -92,7 +92,7 @@ class SummaryBuilder {
         return totalNRMSE;
     }
 
-    private static void buildLineTable(List<String> line, StringBuilder sb){
+    private static void buildLineTable(List<String> line, StringBuilder sb) {
         for (String cellContent : line) {
             sb.append(String.format(FORMAT_CELL, cellContent));
         }

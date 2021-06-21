@@ -1,5 +1,6 @@
 package org.paysim.actors;
 
+import com.opencsv.bean.CsvBindByName;
 import org.paysim.PaySimState;
 import org.paysim.identity.Identifiable;
 import org.paysim.parameters.Parameters;
@@ -13,7 +14,9 @@ public abstract class SuperActor implements Identifiable {
     protected final Deque<Client> prevInteractions;
     protected final Parameters parameters;
 
+    @CsvBindByName
     private boolean isFraud = false;
+
     double balance = 0;
     double overdraftLimit;
 

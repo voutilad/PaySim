@@ -42,7 +42,7 @@ public class SanityCheckTest {
 
     @Test
     void throwsExceptionIfRunningTwice() {
-        Assertions.assertThrows(IllegalStateException.class, () ->{
+        Assertions.assertThrows(IllegalStateException.class, () -> {
             IteratingPaySim sim = new IteratingPaySim(parameters);
             sim.run();
             sim.run();
@@ -83,9 +83,9 @@ public class SanityCheckTest {
         sim.run();
         final AtomicInteger lastStep = new AtomicInteger(0);
         sim.forEachRemaining(tx ->
-            Assertions.assertTrue(
-                    tx.getGlobalStep() == lastStep.incrementAndGet(),
-                    "Each step is 1 greater than the last"));
+                Assertions.assertTrue(
+                        tx.getGlobalStep() == lastStep.incrementAndGet(),
+                        "Each step is 1 greater than the last"));
     }
 
     @Test

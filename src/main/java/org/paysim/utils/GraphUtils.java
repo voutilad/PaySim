@@ -26,43 +26,43 @@ public class GraphUtils {
         return graph;
     }
 
-    public static Vertex getVertex(Graph graph, String vertexName){
+    public static Vertex getVertex(Graph graph, String vertexName) {
         Iterator<Vertex> vertices = graph.vertices(vertexName);
-        if (vertices.hasNext()){
+        if (vertices.hasNext()) {
             return vertices.next();
         } else {
             throw new NoSuchElementException("Vertex was not found");
         }
     }
 
-    public static Edge getEdge(Graph graph, String edgeName){
+    public static Edge getEdge(Graph graph, String edgeName) {
         Iterator<Edge> edges = graph.edges(edgeName);
-        if (edges.hasNext()){
+        if (edges.hasNext()) {
             return edges.next();
         } else {
             throw new NoSuchElementException("Edge was not found");
         }
     }
 
-    public static Object getProperty(Vertex vertex, String propName){
+    public static Object getProperty(Vertex vertex, String propName) {
         Iterator<VertexProperty<Object>> properties = vertex.properties(propName);
-        if (properties.hasNext()){
+        if (properties.hasNext()) {
             return properties.next().value();
         } else {
             throw new NoSuchElementException("Property was not found");
         }
     }
 
-    public static Object getProperty(Edge edge, String propName){
-        Iterator<Property<Object>>  properties = edge.properties(propName);
-        if (properties.hasNext()){
+    public static Object getProperty(Edge edge, String propName) {
+        Iterator<Property<Object>> properties = edge.properties(propName);
+        if (properties.hasNext()) {
             return properties.next().value();
         } else {
             throw new NoSuchElementException("Property was not found");
         }
     }
 
-    public static Map<Double, Double> unserializeMap(String serializedMap){
+    public static Map<Double, Double> unserializeMap(String serializedMap) {
         Map<Double, Double> map = new HashMap<>();
         String[] pairs = serializedMap.split(",");
         for (int i = 0; i < pairs.length; i++) {

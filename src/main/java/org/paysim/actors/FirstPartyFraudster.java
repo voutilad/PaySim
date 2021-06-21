@@ -2,8 +2,8 @@ package org.paysim.actors;
 
 import org.paysim.PaySimState;
 import org.paysim.base.Transaction;
-import org.paysim.identity.*;
 import org.paysim.identity.Properties;
+import org.paysim.identity.*;
 import org.paysim.output.Output;
 import sim.engine.SimState;
 import sim.engine.Steppable;
@@ -33,7 +33,7 @@ public class FirstPartyFraudster extends SuperActor implements HasClientIdentity
         fauxAccounts = new ArrayList<>();
         identities = new ArrayList<>();
 
-        for (int i=0; i<numIdentities; i++) {
+        for (int i = 0; i < numIdentities; i++) {
             identities.add(state.generateIdentity());
         }
         cashoutMule = new Mule(state, this.identity);
@@ -65,8 +65,9 @@ public class FirstPartyFraudster extends SuperActor implements HasClientIdentity
 
     /**
      * Create a fake identity, composing from those created initially by the Fraudster.
-     *
+     * <p>
      * TODO: this is a candidate for a refactor for a few reasons
+     *
      * @param state the current PaySimState
      * @return new ClientIdentity or the only ClientIdentity originally created, null otherwise :-(
      */

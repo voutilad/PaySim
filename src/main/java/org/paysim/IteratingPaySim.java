@@ -19,16 +19,16 @@ import java.util.function.Consumer;
 /**
  * An implementation of the simulation that provides simulation output (i.e. transactions)
  * as a Java Iterator.
- *
+ * <p>
  * The core simulation is driven by a worker thread which communicates simulation results
  * via a shared queue (of finite depth). The iterator draws from the queue until it detects
  * the simulation is completed and the queue is drained. (An atomic flag is set then cleared
  * to communicate if the simulation is still running or not.)
- *
+ * <p>
  * The queue depth is configurable, so if for some reason you'd like to have the simulation
  * only step incrementally, you can set the depth to 1 and it will block when it tries to
  * add to the queue.
- *
+ * <p>
  * For an example of using IteratingPaySim, see the provided main() method.
  */
 public class IteratingPaySim extends PaySimState implements Iterator<Transaction> {

@@ -4,7 +4,6 @@ import com.devskiller.jfairy.Bootstrap;
 import com.devskiller.jfairy.Fairy;
 import com.devskiller.jfairy.producer.company.Company;
 import com.devskiller.jfairy.producer.person.Person;
-import ec.util.MersenneTwisterFast;
 
 import java.util.HashSet;
 import java.util.Locale;
@@ -12,7 +11,7 @@ import java.util.Set;
 
 /**
  * Wraps the jFairy library and provides an identity generation function.
- *
+ * <p>
  * This keeps some of the jFairy confusion to a minimum.
  */
 public class IdentityFactory {

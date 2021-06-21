@@ -41,7 +41,6 @@ public class Mule extends Client {
     }
 
 
-
     @Override
     public Type getType() {
         return Type.MULE;

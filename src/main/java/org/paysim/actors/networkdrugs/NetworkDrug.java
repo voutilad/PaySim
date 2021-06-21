@@ -29,7 +29,7 @@ public class NetworkDrug {
         Edge buyDrugs = GraphUtils.getEdge(graph, "BuyDrugs");
         String probAmountProfileSerialized = (String) GraphUtils.getProperty(buyDrugs, "probAmountProfile");
 
-        Map<Double, Double> mapProbAmountProfile =  GraphUtils.unserializeMap(probAmountProfileSerialized);
+        Map<Double, Double> mapProbAmountProfile = GraphUtils.unserializeMap(probAmountProfileSerialized);
         double meanTr = computeMean(mapProbAmountProfile);
         RandomCollection<Double> probAmountProfile = mapToRandomCollection(mapProbAmountProfile, paySim.random);
 
@@ -46,7 +46,7 @@ public class NetworkDrug {
         return mean;
     }
 
-    private static RandomCollection<Double> mapToRandomCollection(Map<Double, Double> map, MersenneTwisterFast random){
+    private static RandomCollection<Double> mapToRandomCollection(Map<Double, Double> map, MersenneTwisterFast random) {
         RandomCollection<Double> randomCollection = new RandomCollection<>();
         randomCollection.setRandom(random);
         for (Map.Entry<Double, Double> entry : map.entrySet()) {

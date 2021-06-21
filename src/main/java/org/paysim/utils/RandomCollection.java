@@ -30,7 +30,7 @@ public class RandomCollection<E> {
         if (this.random == null) {
             throw new NullPointerException("The RNG must be initialized to pick a random element.");
         }
-        if (this.map.isEmpty()){
+        if (this.map.isEmpty()) {
             throw new IllegalStateException("The collection is empty");
         }
 

@@ -1,5 +1,6 @@
 package org.paysim.actors;
 
+import com.opencsv.bean.CsvRecurse;
 import ec.util.MersenneTwisterFast;
 import org.paysim.PaySimState;
 import org.paysim.base.ClientActionProfile;
@@ -34,7 +35,9 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
     private double expectedAvgTransaction = 0;
     private double initialBalance;
 
+    @CsvRecurse
     private final ClientIdentity identity;
+
     private final List<Merchant> usedMerchants = new ArrayList<>();
     private final List<Client> usedClients = new ArrayList<>();
 
@@ -44,7 +47,7 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
 
         this.bank = state.pickRandomBank();
         this.clientProfile = new ClientProfile(state.pickNextClientProfile(), state.getRNG());
-        this.clientWeight = ((double) clientProfile.getClientTargetCount()) /  state.getParameters().stepsProfiles.getTotalTargetCount();
+        this.clientWeight = ((double) clientProfile.getClientTargetCount()) / state.getParameters().stepsProfiles.getTotalTargetCount();
         this.initialBalance = BalancesClients.pickNextBalance(state.getRNG());
         this.balance = initialBalance;
         this.overdraftLimit = pickOverdraftLimit(state.getRNG());
@@ -128,7 +131,7 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
         if (usedMerchants.size() > 0 &&
                 state.getRNG().nextDouble() < state.getParameters().merchantReuseProbability) {
             return usedMerchants.get(state.getRNG().nextInt(usedMerchants.size()));
-        } else  { // find a new merchant
+        } else { // find a new merchant
             Merchant m = state.pickRandomMerchant();
             usedMerchants.add(m);
             return m;
@@ -214,27 +217,27 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
     }
 
     /**
-     *  The Biased Bernoulli Walk we were doing can go far to the equilibrium of an account
-     *  To avoid this we conceptually add a spring that would be attached to the equilibrium position of the account
+     * The Biased Bernoulli Walk we were doing can go far to the equilibrium of an account
+     * To avoid this we conceptually add a spring that would be attached to the equilibrium position of the account
      */
-    private double computeProbWithSpring(double probUp, double probDown, double currentBalance){
+    private double computeProbWithSpring(double probUp, double probDown, double currentBalance) {
         double equilibrium = 40 * expectedAvgTransaction; // Could also be the initial balance in other models
         double correctionStrength = 3 * Math.pow(10, -5); // In a physical model it would be 1 / 2 * kB * T
         double characteristicLengthSpring = equilibrium;
         double k = 1 / characteristicLengthSpring;
         double springForce = k * (equilibrium - currentBalance);
-        double newProbUp = 0.5d * ( 1d + (expectedAvgTransaction * correctionStrength) * springForce + (probUp - probDown));
+        double newProbUp = 0.5d * (1d + (expectedAvgTransaction * correctionStrength) * springForce + (probUp - probDown));
 
-        if (newProbUp > 1){
-           newProbUp = 1;
-        } else if (newProbUp < 0){
+        if (newProbUp > 1) {
+            newProbUp = 1;
+        } else if (newProbUp < 0) {
             newProbUp = 0;
         }
         return newProbUp;
 
     }
 
-    private boolean isInflow(String action){
+    private boolean isInflow(String action) {
         String[] inflowActions = {CASH_IN, DEPOSIT};
         return Arrays.stream(inflowActions)
                 .anyMatch(action::equals);
@@ -443,10 +446,10 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
         return isFraudulentAccount;
     }
 
-    private double pickOverdraftLimit(MersenneTwisterFast random){
+    private double pickOverdraftLimit(MersenneTwisterFast random) {
         double stdTransaction = 0;
 
-        for (String action: ActionTypes.getActions()){
+        for (String action : ActionTypes.getActions()) {
             double actionProbability = clientProfile.getActionProbability().get(action);
             ClientActionProfile actionProfile = clientProfile.getProfilePerAction(action);
             expectedAvgTransaction += actionProfile.getAvgAmount() * actionProbability;
