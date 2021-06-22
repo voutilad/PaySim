@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class PaySimState extends SimState {
-    public static final double PAYSIM_VERSION = 2.4;
+    public static final double PAYSIM_VERSION = 2.6;
 
     private final Logger logger = LoggerFactory.getLogger(PaySimState.class);
     protected Parameters parameters;
