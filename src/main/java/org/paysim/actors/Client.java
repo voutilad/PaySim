@@ -1,5 +1,6 @@
 package org.paysim.actors;
 
+import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvRecurse;
 import ec.util.MersenneTwisterFast;
 import org.paysim.PaySimState;
@@ -35,6 +36,9 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
     private double expectedAvgTransaction = 0;
     private double initialBalance;
 
+    @CsvBindByName
+    private boolean isFraud = false;
+
     @CsvRecurse
     private final ClientIdentity identity;
 
@@ -65,6 +69,14 @@ public class Client extends SuperActor implements HasClientIdentity, Identifiabl
             return this.identity.id == otherClient.identity.id;
         }
         return false;
+    }
+
+    boolean isFraud() {
+        return isFraud;
+    }
+
+    void setFraud(boolean isFraud) {
+        this.isFraud = isFraud;
     }
 
     @Override

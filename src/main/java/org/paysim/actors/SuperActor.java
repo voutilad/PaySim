@@ -14,9 +14,6 @@ public abstract class SuperActor implements Identifiable {
     protected final Deque<Client> prevInteractions;
     protected final Parameters parameters;
 
-    @CsvBindByName
-    private boolean isFraud = false;
-
     double balance = 0;
     double overdraftLimit;
 
@@ -48,14 +45,6 @@ public abstract class SuperActor implements Identifiable {
         }
 
         return unauthorizedOverdraft;
-    }
-
-    boolean isFraud() {
-        return isFraud;
-    }
-
-    void setFraud(boolean isFraud) {
-        this.isFraud = isFraud;
     }
 
     protected double getBalance() {

@@ -6,14 +6,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MerchantIdentity extends Identity {
-    private static final String MERCHANT_IDENTIFIER = "M";
 
     @CsvBindByName
-    private boolean isHighRisk;
+    private boolean highRisk;
 
     protected MerchantIdentity(String id, String name, boolean isHighRisk) {
-        super(id, MERCHANT_IDENTIFIER + name);
-        this.isHighRisk = isHighRisk;
+        super(id, name);
+        this.highRisk = isHighRisk;
     }
 
     protected MerchantIdentity(String id, String name) {
@@ -21,11 +20,11 @@ public class MerchantIdentity extends Identity {
     }
 
     public boolean isHighRisk() {
-        return isHighRisk;
+        return highRisk;
     }
 
     public void setHighRisk(boolean highRisk) {
-        isHighRisk = highRisk;
+        this.highRisk = highRisk;
     }
 
     @Override
@@ -33,7 +32,7 @@ public class MerchantIdentity extends Identity {
         Map<String, Object> map = new HashMap<>();
         map.put(Properties.NAME, name);
         map.put(Properties.ID, id);
-        map.put(Properties.HIGH_RISK, isHighRisk);
+        map.put(Properties.HIGH_RISK, highRisk);
         return map;
     }
 }
