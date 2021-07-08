@@ -16,6 +16,7 @@ import java.util.Set;
  */
 public class IdentityFactory {
     private final Set<String> ccnSet = new HashSet<>();
+    private final Set<String> merchantIdSet = new HashSet<>();
 
     final private Fairy fairy;
 
@@ -49,7 +50,14 @@ public class IdentityFactory {
     }
 
     public MerchantIdentity nextMerchant() {
+        int i = 0;
         Company c = fairy.company();
+        while (!merchantIdSet.add(c.getVatIdentificationNumber())) {
+            // If we can't find a unique id after a handful of attempts, just use a number
+            // suffix to hopefully get something unique. Yes, this is hacky.
+            c = new Company(c.getName(), c.getDomain(), c.getEmail(),
+                    String.format("%s-%d", c.getVatIdentificationNumber(), merchantIdSet.size()));
+        }
         return new MerchantIdentity(c.getVatIdentificationNumber(), c.getName());
     }
 

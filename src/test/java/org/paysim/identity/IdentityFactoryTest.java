@@ -44,14 +44,14 @@ public class IdentityFactoryTest {
 
     @Test
     void collisionTest() {
-        System.out.println("Starting collision test...");
+        System.out.println("Starting collisionTest...");
         final long start = System.currentTimeMillis();
         final int max = 1_000_000;
         final AtomicInteger collisions = new AtomicInteger(0);
         final IdentityFactory factory = new IdentityFactory(1);
         final HashSet<String> ccSet = new HashSet<>(max);
 
-        Assertions.assertTimeout(Duration.ofSeconds(15), () -> {
+        Assertions.assertTimeout(Duration.ofSeconds(120), () -> {
             while (ccSet.size() < max) {
                 String cc = factory.getNextCreditCard();
                 while (!ccSet.add(cc)) {
@@ -63,5 +63,30 @@ public class IdentityFactoryTest {
         final long finish = System.currentTimeMillis();
         System.out.println("Finished in " + (finish - start) + " millis");
         System.out.println("collisions: " + collisions.get());
+        Assertions.assertEquals(0, collisions.get());
+    }
+
+    @Test
+    void merchantCollisionTest() {
+        System.out.println("Starting merchantCollisionTest...");
+        final long start = System.currentTimeMillis();
+        final int max = 1_000_000;
+        final AtomicInteger collisions = new AtomicInteger(0);
+        final IdentityFactory factory = new IdentityFactory(1);
+        final HashSet<String> merchantSet = new HashSet<>(max);
+
+        Assertions.assertTimeout(Duration.ofSeconds(120), () -> {
+            while (merchantSet.size() < max) {
+                MerchantIdentity mi = factory.nextMerchant();
+                while (!merchantSet.add(mi.getId())) {
+                    collisions.incrementAndGet();
+                    mi = factory.nextMerchant();
+                }
+            }
+        });
+        final long finish = System.currentTimeMillis();
+        System.out.println("Finished in " + (finish - start) + " millis");
+        System.out.println("collisions: " + collisions.get());
+        Assertions.assertEquals(0, collisions.get());
     }
 }
